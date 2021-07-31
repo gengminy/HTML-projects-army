@@ -16,9 +16,11 @@
 > changgi
 >
 > + changgi.html - <장기> 게임 입니다 말은 움직일 수 있지만 게임 전체는 미완성입니다
+>
 > chess
 >
 > + NCCCHESS_1.1.html - 한 컴퓨터에서 두명이 플레이 할 수 있는 <체스> 게임입니다
+>
 > mine
 >
 > + mine.html - <지뢰찾기> 게임입니다
