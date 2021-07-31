@@ -1,0 +1,746 @@
+<!Doctype html>
+<html>
+	<head>
+		<meta charset = "UTF-8">
+		
+		
+		<style>
+			body{ user-select: none; }
+			table{ border: 4px solid black; border-spacing: 0; margin: 0 auto;}
+			td{ transition: 0.2s; width: 12px; text-align: center;  }
+			
+			tr.top td{	height:120px; }
+			tr.bottom td{	height:80px; }
+			
+			
+			.bottom td{ border-right: 2px solid black; }
+			.top td[class~="empty"]:nth-child(3n-1){ border-right: 2px solid black; }
+			.top td[class~="empty"]:nth-child(4n){ border-right: 2px solid black; }
+			
+			
+			.top td{ width: 12px;}
+			
+			td.black{ width: 30px; background:black; color: white; }
+			td.hover{ background:#B8B8B8; }
+			td.black:hover{ opacity: 0.85; }
+			
+			td.empty{ width: 24px; }
+			
+			
+			
+			td.pressed{ background: red; }
+			
+			.invalid{ background: red; color: white; }
+
+		</style>
+	</head>
+	<body>
+
+		<div class="wrapper">
+			<div>
+				<table>
+					<tr class="top">
+						<td class="empty" colspan=2></td>
+						<td class="black" colspan=2></td>
+						<td></td>
+						<td class="black" colspan=2></td>
+						<td class="empty" colspan=2></td>
+						<td class="empty" colspan=2></td>
+						<td class="black" colspan=2></td>
+						<td></td>
+						<td class="black" colspan=2></td>
+						<td></td>
+						<td class="black" colspan=2></td>
+						<td class="empty" colspan=2></td>
+						
+						
+						<td class="empty" colspan=2></td>
+						<td class="black" colspan=2></td>
+						<td></td>
+						<td class="black" colspan=2></td>
+						<td class="empty" colspan=2></td>
+						<td class="empty" colspan=2></td>
+						<td class="black" colspan=2></td>
+						<td></td>
+						<td class="black" colspan=2></td>
+						<td></td>
+						<td class="black" colspan=2></td>
+						<td class="empty" colspan=2></td>
+						
+						<td class="empty" colspan=2></td>
+						<td class="black" colspan=2></td>
+						<td></td>
+						<td class="black" colspan=2></td>
+						<td class="empty" colspan=2></td>
+						<td class="empty" colspan=2></td>
+						<td class="black" colspan=2></td>
+						<td></td>
+						<td class="black" colspan=2></td>
+						<td></td>
+						<td class="black" colspan=2></td>
+						<td class="empty" colspan=2></td>
+
+						<td class="empty" colspan=2></td>
+						<td class="black" colspan=2></td>
+						<td></td>
+						<td class="black" colspan=2></td>
+						<td class="empty" colspan=2></td>
+						<td class="empty" colspan=2></td>
+						<td class="black" colspan=2></td>
+						<td></td>
+						<td class="black" colspan=2></td>
+						<td></td>
+						<td class="black" colspan=2></td>
+						<td class="empty" colspan=2></td>		
+
+						<td class="empty" colspan=2></td>
+						<td class="black" colspan=2></td>
+						<td></td>
+						<td class="black" colspan=2></td>
+						<td class="empty" colspan=2></td>
+						<td class="empty" colspan=2></td>
+						<td class="black" colspan=2></td>
+						<td></td>
+						<td class="black" colspan=2></td>
+						<td></td>
+						<td class="black" colspan=2></td>
+						<td class="empty" colspan=2></td>					
+					</tr>				
+					<tr class="bottom">
+						<td colspan=3></td>
+						<td colspan=3></td>
+						<td colspan=3></td>
+						<td colspan=3></td>
+						<td colspan=3></td>
+						<td colspan=3></td>
+						<td colspan=3></td>
+						
+						<td colspan=3></td>
+						<td colspan=3></td>
+						<td colspan=3></td>
+						<td colspan=3></td>
+						<td colspan=3></td>
+						<td colspan=3></td>
+						<td colspan=3></td>
+						
+						<td colspan=3></td>
+						<td colspan=3></td>
+						<td colspan=3></td>
+						<td colspan=3></td>
+						<td colspan=3></td>
+						<td colspan=3></td>
+						<td colspan=3></td>
+						
+						<td colspan=3></td>
+						<td colspan=3></td>
+						<td colspan=3></td>
+						<td colspan=3></td>
+						<td colspan=3></td>
+						<td colspan=3></td>
+						<td colspan=3></td>	
+
+						<td colspan=3></td>
+						<td colspan=3></td>
+						<td colspan=3></td>
+						<td colspan=3></td>
+						<td colspan=3></td>
+						<td colspan=3></td>
+						<td colspan=3></td>						
+					</tr>				
+				</table>
+			</div>	
+		</div>
+		
+
+		<div id="test"></div>
+		
+	
+		<script type = "text/javascript">
+		
+		
+		class Piano{
+			constructor(_$wrapper=null){
+				this._audioContext = new AudioContext();
+				this._primaryGainControl = this._audioContext.createGain();
+				this._$wrapper = _$wrapper;
+				this._$top = null;
+				this._$bottom = null;
+				this._init();
+			}
+			
+			_init(){
+				this._primaryGainControl.gain.setValueAtTime(0.05, 0);
+				this._primaryGainControl.connect(this._audioContext.destination);
+				setClickEvent(0, 0, document.querySelector(".bottom"), document.querySelector(".top"));
+			}
+
+			_FREQUENCY = {
+				ALL: [
+					65.41,	69.30,	74.92,	77.79,	82.41,	87.31,	91.75,	98.0,  103.83,	110.0, 116.54,	123.47,
+					130.81, 138.59,	149.83, 155.57,	164.82, 174.62, 183.5,	196.0, 207.65,	220.0, 233.08,	246.94,
+					261.63, 277.18,	299.66, 311.13,	329.63, 349.23, 366.99,	392.0, 415.3,	440.0, 466.16,	493.88,
+					523.25, 554.36,	599.32, 622.26,	659.26, 698.46, 733.98,	784.0, 830.6,	880.0, 932.32,	987.76,
+					1046.5, 1108.72, 1198.64, 1244.52, 1318.52, 1396.62, 1467.96, 1568.0, 1661.2, 1760.0, 1864.64, 1975.52
+				],
+				WHITE: [
+					65.41,	74.92,	82.41,	87.31,	98.0,  110.0, 123.47,
+					130.81, 149.83, 164.82, 174.62, 196.0, 220.0, 246.94,
+					261.63, 299.66, 329.63, 349.23, 392.0, 440.0, 493.88,
+					523.25, 599.32, 659.26, 698.46, 784.0, 880.0, 987.76,
+					1046.5, 1198.64, 1318.52, 1396.62, 1568.0, 1760.0, 1975.52
+				],
+				BLACK: [
+					69.30, 77.79, 91.75, 103.83, 116.54,
+					138.59, 155.57, 183.5, 207.65, 233.08,
+					277.18, 311.13, 366.99, 415.3, 466.16,
+					554.36,	622.26, 733.98, 830.6, 932.32,
+					1108.72, 1244.52, 1467.96, 1661.20, 1864.64
+				]	
+			};
+			
+			
+			_KEYLIST = {
+				TOP: {
+					BLACK: [49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 189, 187, 8],
+					BLACK_KEYNAME: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '←'],
+					WHITE: [81, 87, 69, 82, 84, 89, 85, 73, 79, 80, 219, 221, 220],
+					WHITE_KEYNAME: ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '[', ']', '\\']
+				},
+				BOTTOM: {
+					BLACK: [65, 83, 68, 70, 71, 72, 74, 75, 76, 186],
+					BLACK_KEYNAME: ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ';'],
+					WHITE: [90, 88, 67, 86, 66, 78, 77, 188, 190, 191],
+					WHITE_KEYNAME: ['Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.', '/']
+				}
+			}
+			
+			
+			
+			/*_$wrapper 의 자식요소로 피아노 DOM 객체 생성*/
+			createPiano(count=5, _$wrapper = this._$wrapper){
+				if(_$wrapper == null){ console.log("Argument 2 is not defined"); return;}
+				Piano.createPiano(count, _$wrapper);
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+			_setPressedColor($target=null){
+				if($target==null) return;
+				$target.classList.add("pressed");
+			}
+			_removePressedColor($target=null){
+				if($target==null) return;
+				$target.classList.remove("pressed");
+			}
+			setClickEvent(){
+				for(let i=0; i<this._FREQUENCY["WHITE"].length; ++i){
+					this._$bottom.children[i].addEventListener("mousedown", ()=>{
+						this.makeNote(this._FREQUENCY["WHITE"][i]);
+						this._setPressedColor(this._$bottom.children[i]);
+					});
+					this._$bottom.children[i].addEventListener("mouseup", () =>{
+						this._removePressedColor(this._$bottom.children[i]);
+					});
+				}
+				for(let i=0; i<this._FREQUENCY["ALL"].length; ++i){
+					this_$top.children[i].addEventListener("mousedown", ()=>{
+						this.makeNote(this._FREQUENCY["ALL"][i]);
+						this._setPressedColor(this._$top.children[i]);
+					});
+					this._$top.children[i].addEventListener("mouseup", ()=>{
+						this._removePressedColor(this._$top.children[i]);
+					});
+				}
+			}
+
+			setMouseEventLink(){
+				function setEvent(topIdx, bottomIdx){
+					this._$bottom.children[topIdx].addEventListener("mouseenter", function(){
+						this.classList.add("hover"); this._$top.children[bottomIdx].classList.add("hover"); });
+					this._$bottom.children[topIdx].addEventListener("mouseout", function(){
+						this.classList.remove("hover"); this._$top.children[bottomIdx].classList.remove("hover"); });
+					this._$top.children[bottomIdx].addEventListener("mouseenter", function(){
+						this.classList.add("hover"); this._$bottom.children[topIdx].classList.add("hover"); });
+					this._$top.children[bottomIdx].addEventListener("mouseout", function(){
+						this.classList.remove("hover"); this._$bottom.children[topIdx].classList.remove("hover"); });
+					this._$bottom.children[topIdx].addEventListener("mousedown", function(){
+						this._$top.children[bottomIdx].classList.add("pressed"); });
+					this._$bottom.children[topIdx].addEventListener("mouseup", function(){
+						this._$top.children[bottomIdx].classList.remove("pressed"); });
+					this._$top.children[bottomIdx].addEventListener("mousedown", function(){
+						this._$bottom.children[topIdx].classList.add("pressed"); });
+					this._$top.children[bottomIdx].addEventListener("mouseup", function(){
+						this._$bottom.children[topIdx].classList.remove("pressed"); });	
+				}
+				
+				for(let i=0; i<Math.floor(this._$bottom.childElementCount/7); ++i){
+					for(let count=0; count < 3; ++count) setEvent(7*i+count, 12*i+2*count);
+					for(let count=3; count < 7; ++count) setEvent(7*i+count, 12*i+2*count-1);
+				}
+			}
+			
+
+			static createPiano(count, $wrapper=null){
+				if($wrapper == null){ console.log("Argument 2 is not defined"); return;}
+				
+				let $table = document.createElement("table")
+				
+				let $top = document.createElement("tr");
+				$top.className = "top";
+				let $bottom = document.createElement("tr");
+				$bottom.className = "bottom";
+				
+				let $td;
+				
+				//건반 count * 옥타브 생성
+				for(let wholeCount=0; wholeCount<count; ++wholeCount){
+					let MAP = {0: "empty", 1: "black", 3:"black", 4:"empty", 5:"empty", 6:"black", 8:"black", 10:"black", 11:"empty"}
+					for(let i=0; i<12; ++i){
+						$td = document.createElement("td");
+						if(MAP[i]){
+							$td.colSpan = 2;
+							$td.className = MAP[i];
+						}
+						$top.appendChild($td);
+					}
+				
+					for(let i=0; i<7; ++i){
+						$td = document.createElement("td");
+						$td.colSpan = 3;
+						$bottom.appendChild($td);
+					}
+				}
+				
+				$table.appendChild($top);
+				$table.appendChild($bottom);
+				$wrapper.appendChild($table);
+			}
+			
+			
+			makeNote(frequency){
+				const noteOscillator = this._audioContext.createOscillator();
+				noteOscillator.type = "square";
+				noteOscillator.frequency.setValueAtTime(frequency, this._audioContext.currentTime);
+					
+				const vibrato = this._audioContext.createOscillator();
+				vibrato.frequency.setValueAtTime(10, 0);
+				const vibratoGain = this._audioContext.createGain();
+				vibratoGain.gain.setValueAtTime(1.5, 0);
+				vibrato.connect(vibratoGain);
+				vibratoGain.connect(noteOscillator.frequency);
+				vibrato.start();
+					
+				const attackTime = 0.1;
+				const decayTime = 0.1;
+				const sustainLevel = 0.7;
+				const releaseTime = 1;
+					
+				const now = this._audioContext.currentTime;
+				const noteGain = this._audioContext.createGain();
+				noteGain.gain.setValueAtTime(0, 0);
+				noteGain.gain.linearRampToValueAtTime(1, now + attackTime);
+				noteGain.gain.linearRampToValueAtTime(sustainLevel, now + attackTime + decayTime);
+				
+				noteGain.gain.setValueAtTime(sustainLevel, now + 1 - releaseTime);
+				noteGain.gain.linearRampToValueAtTime(0, now + 1);
+				
+				noteOscillator.connect(noteGain);
+				noteGain.connect(this._primaryGainControl);
+				noteOscillator.start();
+				noteOscillator.stop(this._audioContext.currentTime + 1);				
+			}
+			
+			
+			
+			static makeNote(frequency){
+				let _audioContext = new AudioContext();
+				let _primaryGainControl = _audioContext.createGain();
+				_primaryGainControl.gain.setValueAtTime(0.05, 0);
+				_primaryGainControl.connect(_audioContext.destination);		
+				const noteOscillator = _audioContext.createOscillator();
+				noteOscillator.type = "square";
+				noteOscillator.frequency.setValueAtTime(frequency, _audioContext.currentTime);
+					
+				const vibrato = _audioContext.createOscillator();
+				vibrato.frequency.setValueAtTime(10, 0);
+				const vibratoGain = _audioContext.createGain();
+				vibratoGain.gain.setValueAtTime(1.5, 0);
+				vibrato.connect(vibratoGain);
+				vibratoGain.connect(noteOscillator.frequency);
+				vibrato.start();
+					
+				const attackTime = 0.1;
+				const decayTime = 0.1;
+				const sustainLevel = 0.7;
+				const releaseTime = 1;
+					
+				const now = _audioContext.currentTime;
+				const noteGain = _audioContext.createGain();
+				noteGain.gain.setValueAtTime(0, 0);
+				noteGain.gain.linearRampToValueAtTime(1, now + attackTime);
+				noteGain.gain.linearRampToValueAtTime(sustainLevel, now + attackTime + decayTime);
+				
+				noteGain.gain.setValueAtTime(sustainLevel, now + 1 - releaseTime);
+				noteGain.gain.linearRampToValueAtTime(0, now + 1);
+				
+				noteOscillator.connect(noteGain);
+				noteGain.connect(_primaryGainControl);
+				noteOscillator.start();
+				noteOscillator.stop(_audioContext.currentTime + 1);
+			}
+			
+		}
+		
+		
+			const audioContext = new AudioContext();
+	
+			const KEYLIST = {
+				TOP: {
+					BLACK: [49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 189, 187, 8],
+					BLACK_KEYNAME: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '←'],
+					WHITE: [81, 87, 69, 82, 84, 89, 85, 73, 79, 80, 219, 221, 220],
+					WHITE_KEYNAME: ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '[', ']', '\\']
+				},
+				BOTTOM: {
+					BLACK: [65, 83, 68, 70, 71, 72, 74, 75, 76, 186],
+					BLACK_KEYNAME: ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ';'],
+					WHITE: [90, 88, 67, 86, 66, 78, 77, 188, 190, 191],
+					WHITE_KEYNAME: ['Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.', '/']
+				}
+			}
+			
+			const FREQUENCY = {
+				ALL: [
+					65.41,	69.30,	74.92,	77.79,	82.41,	87.31,	91.75,	98.0,  103.83,	110.0, 116.54,	123.47,
+					130.81, 138.59,	149.83, 155.57,	164.82, 174.62, 183.5,	196.0, 207.65,	220.0, 233.08,	246.94,
+					261.63, 277.18,	299.66, 311.13,	329.63, 349.23, 366.99,	392.0, 415.3,	440.0, 466.16,	493.88,
+					523.25, 554.36,	599.32, 622.26,	659.26, 698.46, 733.98,	784.0, 830.6,	880.0, 932.32,	987.76,
+					1046.5, 1108.72, 1198.64, 1244.52, 1318.52, 1396.62, 1467.96, 1568.0, 1661.2, 1760.0, 1864.64, 1975.52
+				],
+				
+				WHITE: [
+					65.41,	74.92,	82.41,	87.31,	98.0,  110.0, 123.47,
+					130.81, 149.83, 164.82, 174.62, 196.0, 220.0, 246.94,
+					261.63, 299.66, 329.63, 349.23, 392.0, 440.0, 493.88,
+					523.25, 599.32, 659.26, 698.46, 784.0, 880.0, 987.76,
+					1046.5, 1198.64, 1318.52, 1396.62, 1568.0, 1760.0, 1975.52
+				
+				],
+				
+				BLACK: [
+					69.30, 77.79, 91.75, 103.83, 116.54,
+					138.59, 155.57, 183.5, 207.65, 233.08,
+					277.18, 311.13, 366.99, 415.3, 466.16,
+					554.36,	622.26, 733.98, 830.6, 932.32,
+					1108.72, 1244.52, 1467.96, 1661.20, 1864.64
+				]
+			}
+
+			
+			////키보드 이벤트 건반에 연결
+			function setKeydownEvent(begin){
+				if(typeof(begin)=="object") begin = getChildOrder(begin);
+				
+				let $top = document.querySelector(".top");
+				let $bottom = document.querySelector(".bottom");
+
+				
+				let whiteKeySet = KEYLIST["BOTTOM"]["WHITE"].concat(KEYLIST["TOP"]["WHITE"]);
+				let whiteKeyName = KEYLIST["BOTTOM"]["WHITE_KEYNAME"].concat(KEYLIST["TOP"]["WHITE_KEYNAME"]);
+				let blackKeySet = KEYLIST["BOTTOM"]["BLACK"].concat(KEYLIST["TOP"]["BLACK"]);
+				let blackKeyName = KEYLIST["BOTTOM"]["BLACK_KEYNAME"].concat(KEYLIST["TOP"]["BLACK_KEYNAME"]);
+
+				for(let i=0; i<whiteKeySet.length && i+begin<$bottom.childElementCount; ++i){
+					setWhiteKeyboardLink($bottom.children[i+begin], whiteKeySet[i], whiteKeyName[i]);
+				}
+				
+				
+				let $rev = get$KeyboardLinkTarget($bottom.children[begin], "bottom");
+				let revise = getChildOrder($rev)-1;
+				let count = 0;
+				
+				for(let i=0; count<blackKeySet.length && i<$top.childElementCount; ++i){
+					$target = $top.children[i+revise];
+					if($target.classList.contains("black")){
+						count = Math.ceil(count);
+						setBlackKeyboardLink($target, blackKeySet[count], blackKeyName[count]);
+						count++;
+					}
+					else if($target.classList.contains("empty")){
+						count+=0.5;
+					}
+				}
+			}
+			setKeydownEvent(4);
+			
+			// 키 눌렀을때 애니메이션
+			function setClickEvent(begin, end, $target=null, $top=null){
+				if($target==null||$top==null) return;
+				
+				for(let i=0; i<FREQUENCY["WHITE"].length; ++i){
+					$target.children[i].onmousedown = () =>{
+						makeNote(FREQUENCY["WHITE"][i]);
+						setPressedColor($target.children[i]);
+					}
+					$target.children[i].onmouseup = () =>{
+						removePressedColor($target.children[i]);
+					}
+				}
+				
+				for(let i=0; i<FREQUENCY["ALL"].length; ++i){
+					$top.children[i].onmousedown = () =>{
+						makeNote(FREQUENCY["ALL"][i]);
+						setPressedColor($top.children[i]);
+					}
+					$top.children[i].onmouseup = () =>{
+						removePressedColor($top.children[i]);
+					}
+				}
+			}
+			function setPressedColor($target=null){
+				if($target==null) return;
+				$target.classList.add("pressed");
+			}
+			function removePressedColor($target=null){
+				if($target==null) return;
+				$target.classList.remove("pressed");
+			}
+			
+			setClickEvent(0, 0, document.querySelector(".bottom"), document.querySelector(".top"));
+			
+			
+			/////////////////
+			
+			
+			//테이블 상단과 하단 연결해주는 함수
+			
+			function setMouseEventLink($top=null, $bottom=null){
+				if($top==null||$bottom==null) return;
+				
+				function setEvent(topIdx, bottomIdx){
+					$top.children[topIdx].addEventListener("mouseenter", function(){
+						this.classList.add("hover");
+						$bottom.children[bottomIdx].classList.add("hover");
+					});
+					$top.children[topIdx].addEventListener("mouseout", function(){
+						this.classList.remove("hover");
+						$bottom.children[bottomIdx].classList.remove("hover");
+					});
+					$bottom.children[bottomIdx].addEventListener("mouseenter", function(){
+						this.classList.add("hover");
+						$top.children[topIdx].classList.add("hover");							
+					});
+					$bottom.children[bottomIdx].addEventListener("mouseout", function(){
+						this.classList.remove("hover");
+						$top.children[topIdx].classList.remove("hover");							
+					});
+					
+					$top.children[topIdx].addEventListener("mousedown", function(){
+						$bottom.children[bottomIdx].classList.add("pressed");
+					});
+					$top.children[topIdx].addEventListener("mouseup", function(){
+						$bottom.children[bottomIdx].classList.remove("pressed");
+					});
+					$top.children[topIdx].addEventListener("mouseleave", function(){
+						this.classList.remove("pressed");
+						$bottom.children[bottomIdx].classList.remove("pressed");
+					});
+					
+					$bottom.children[bottomIdx].addEventListener("mousedown", function(){
+						$top.children[topIdx].classList.add("pressed");
+					});
+					$bottom.children[bottomIdx].addEventListener("mouseup", function(){
+						$top.children[topIdx].classList.remove("pressed");
+					});
+					$bottom.children[bottomIdx].addEventListener("mouseleave", function(){
+						this.classList.remove("pressed");
+						$top.children[topIdx].classList.remove("pressed");
+					});	
+				}
+				
+				for(let i=0; i<Math.floor($top.childElementCount/7); ++i){
+					for(let count=0; count < 3; ++count)
+						setEvent(7*i+count, 12*i+2*count);
+					for(let count=3; count < 7; ++count)
+						setEvent(7*i+count, 12*i+2*count-1);
+				}
+			}
+			setMouseEventLink(document.querySelector(".bottom"), document.querySelector(".top"));
+			
+			///////////////////////////
+			
+			//몇번째 자식인지 반환하는 함수
+			function getChildOrder($target){
+				let $parent = $target.parentElement;
+				for(let i=0; i<$parent.childElementCount; ++i){
+					if($parent.children[i] == $target) return i;
+				}
+				return -1;
+			}
+			
+			//해당 건반이 몇번째 자식인지 반환하는 함수
+			
+			function getKeyboardChildOrder($target){
+				let $parent = $target.parentElement;
+				if($parent == document.querySelector(".top")){
+					let count = 0;
+					for(let i=0; i<$parent.childElementCount; ++i){
+						if($parent.children[i] == $target) return count;
+						if($parent.children[i].classList.contains("black")) count++;
+					}
+				}
+				else{
+					getChildOrder($target);
+				}
+				return -1;
+			}
+			
+			//연결된 건반이 몇번째 자식인지 반환해주는 함수
+			function getLinkChildOrder($target, originPosition="bottom"){
+				if(originPosition=="bottom")
+					return getChildOrder(get$KeyboardLinkTarget($target, "bottom"));
+				else if(originPosition=="top")
+					return getChildOrder(get$KeyboardLinkTarget($target, "top"));
+				else return -1;
+			}
+			//몇번째 건반과 연결해야하는지 DOM객체 반환하는 함수
+			function get$KeyboardLinkTarget($target, originPosition="bottom"){
+				let order = getChildOrder($target);
+				let div, count, result;
+				
+				if($target.classList.contains("black")) return null;
+				
+				if(originPosition == "top"){
+					div = Math.floor(order / 12);
+					count = order % 12;
+					if(0 <= count && count < 5) result = 7*div+Math.floor(count/2);
+					else if(5 <= count && count < 12) result = 7*div+Math.floor(count/2)+1;
+					return document.querySelector(".bottom").children[result];
+				}
+				else if(originPosition == "bottom"){
+					div = Math.floor(order / 7);
+					count = order % 7;
+					if(0 <= count && count < 3) result = 12*div+2*count;
+					else if(3 <= count && count < 7) result = 12*div+2*count-1;
+					else result = 0;
+					return document.querySelector(".top").children[result];
+				}
+				else return null;
+			}
+			
+			
+			function setWhiteKeyboardLink($bottomTarget, keycode, keyname=""){
+				$bottomTarget.innerText += keyname;
+				
+				document.addEventListener("keydown", (e)=>{
+					if(e.keyCode == keycode){
+						$bottomTarget.classList.add("pressed");
+						makeNote(FREQUENCY["WHITE"][getChildOrder($bottomTarget)]);
+						get$KeyboardLinkTarget($bottomTarget, "bottom").classList.add("pressed");
+					}
+				});
+				document.addEventListener("keyup", (e)=>{
+					if(e.keyCode == keycode){
+						$bottomTarget.classList.remove("pressed");
+						get$KeyboardLinkTarget($bottomTarget, "bottom").classList.remove("pressed");
+					}
+				});
+			}
+			//example => setWhiteKeyboardLink(document.querySelector(".bottom").children[14], 69, "E");
+			
+			function setBlackKeyboardLink($topTarget, keycode, keyname=""){
+				$topTarget.innerText += keyname;
+				document.addEventListener("keydown", (e)=>{
+					if(e.keyCode == keycode){
+						$topTarget.classList.add("pressed");
+						makeNote(FREQUENCY["BLACK"][getKeyboardChildOrder($topTarget)]);
+					}
+				});
+				document.addEventListener("keyup", (e)=>{
+					if(e.keyCode == keycode)
+						$topTarget.classList.remove("pressed");
+				});
+			}
+			//
+			
+			//example => setBlackKeyboardLink(document.querySelector(".top").children[25], 52, "4");
+			
+
+			
+			
+			
+			const primaryGainControl = audioContext.createGain();
+			primaryGainControl.gain.setValueAtTime(0.05, 0);
+			primaryGainControl.connect(audioContext.destination);
+			
+			//해당 주파수에 해당하는 음 재생
+			function makeNote(frequency){
+				const noteOscillator = audioContext.createOscillator();
+				noteOscillator.type = "square";
+				noteOscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+					
+				const vibrato = audioContext.createOscillator();
+				vibrato.frequency.setValueAtTime(10, 0);
+				const vibratoGain = audioContext.createGain();
+				vibratoGain.gain.setValueAtTime(1.5, 0);
+				vibrato.connect(vibratoGain);
+				vibratoGain.connect(noteOscillator.frequency);
+				vibrato.start();
+					
+				const attackTime = 0.1;
+				const decayTime = 0.1;
+				const sustainLevel = 0.7;
+				const releaseTime = 1;
+					
+				const now = audioContext.currentTime;
+				const noteGain = audioContext.createGain();
+				noteGain.gain.setValueAtTime(0, 0);
+				noteGain.gain.linearRampToValueAtTime(1, now + attackTime);
+				noteGain.gain.linearRampToValueAtTime(sustainLevel, now + attackTime + decayTime);
+				
+				noteGain.gain.setValueAtTime(sustainLevel, now + 1 - releaseTime);
+				noteGain.gain.linearRampToValueAtTime(0, now + 1);
+				
+				noteOscillator.connect(noteGain);
+				noteGain.connect(primaryGainControl);
+				noteOscillator.start();
+				noteOscillator.stop(audioContext.currentTime + 1);				
+			}
+			
+
+			/*
+			//건반 1옥타브
+			<table>
+				<tr class="top">
+					<td class="empty" colspan=2></td>
+					<td class="black" colspan=2></td>
+					<td></td>
+					<td class="black" colspan=2></td>
+					<td class="empty" colspan=2></td>
+					<td class="empty" colspan=2></td>
+					<td class="black" colspan=2></td>
+					<td></td>
+					<td class="black" colspan=2></td>
+					<td></td>
+					<td class="black" colspan=2></td>
+					<td class="empty" colspan=2></td>
+				</tr>
+				<tr class="bottom">
+					<td colspan=3></td>
+					<td colspan=3></td>
+					<td colspan=3></td>
+					<td colspan=3></td>
+					<td colspan=3></td>
+					<td colspan=3></td>
+					<td colspan=3></td>
+				</tr>				
+			</table>
+			*/
+		</script>
+	</body>
+</html>

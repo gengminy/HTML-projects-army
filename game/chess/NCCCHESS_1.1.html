@@ -1,0 +1,2181 @@
+﻿<!Doctype html>
+<html>
+	<head>
+		<meta charset = "UTF-8">
+		<title>Chess</title>
+		
+		<style>
+			body{
+				user-select: none;
+				overflow: hidden;
+			}
+			
+			
+			.darkmode table{ border: 1px solid white; color: white; }
+			.darkmode .moveListBoard{ border: 1px solid white; background: white; }
+			.darkmode .moveListBoard li{ border: 1px solid white; }
+			.darkmode .moveListBoard li.black{ border: 1px solid white; background: black; }
+			.darkmode .black{ border: 1px solid white; }
+			.darkmode .caught{ border: 1px solid white; }
+			.darkmode .caught_mid{ border: 1px solid white; }
+			.darkmode .LEFT p{ text-shadow: 0 0 3px #FFF; }
+			.darkmode .RIGHT p{ color: white; }
+			.darkmode #mid{ border: 1px solid white; }
+			
+			
+			.chessBackground{
+				background: url('./img/main.chess');
+				background-size: 100% 100%;
+			}
+			.setting{
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+			.main{
+				color: white;
+				text-shadow: 0 0 5px #000;
+				min-width: 1800px;
+				min-height: 800px;
+				margin: 0 auto;
+				text-align: center;
+			}
+			.main h1{
+				font-size: 200px;
+				color: white;
+				line-height: 600px;
+				margin: 30px;
+				text-shadow: 0 0 30px #000;
+				-webkit-text-stroke: medium;
+			}
+			.main button{
+				height: 50px;
+				width: 600px;
+				font-size: 30px;
+				background: white;
+				border: 3px solid black;
+				transition: 0.2s;
+				opacity: 0.5;
+			}
+			.main button:hover{
+				opacity: 0.9;
+			}
+			.main button:disabled{
+				opacity: 0.4;
+			}
+			.wrapper{
+				margin: 0 auto;
+				display: flex;
+			}
+			.left{
+				min-height: 750px;
+				height: 750px;
+				margin: 10px;
+				order: 1
+			}
+			#mid{
+				height: 750px;
+				margin: 10px;
+				width: 222px;
+				border: 1px solid black;
+				order: 2
+			}
+			.moveListBoard{
+				border: 1px solid black;
+				height: 400px;
+				width: 90%;
+				margin: 0 auto;
+				overflow-y: scroll;
+			}
+			.moveListBoard::-webkit-scrollbar{
+				display: none;
+			}
+
+			.right{
+				min-height: 750px;
+				height: 750px;
+				margin: 10px;
+				order: 3
+			}
+			.reverse{
+				transform: rotate(180deg);
+			}
+			table{
+				min-width:750px;
+				min-height:750px;
+				margin: 0px;
+				padding: 0px;
+				border: 1px solid black;
+				
+			}
+			tr, td{
+				text-align: center;
+				align-items: center;
+				border: black 1px solid;
+				margin: 0px;
+				backface-visibility: visible;
+				mix-blend-mode: multiply;		
+			}
+			td p{
+				margin: 0 auto;
+				font-size: 60px;
+				cursor: pointer;
+				transition: 0.3s;			
+			}
+			.labelRow{
+				width: 20px;
+				border: 0;
+			}
+			.labelColumn{
+				height: 20px;
+				border: 0;
+			}
+
+			.moveListBoard ul{
+				width: 100%;
+				list-style: none;
+				text-align: center;
+				padding: 0; margin: 0 auto; border: 0;
+			}
+			.moveListBoard li{
+				font-weight: 800;
+				margin: 0; padding: 0; border-bottom: 1px solid black;
+			}
+			.moveListBoard li.black{
+				background: black;
+				color: white;
+			}
+						
+
+			.bl{
+				background: gray;
+				width:80px;
+				height: 80px;
+			}
+			.wt{
+				background: white;
+				width:80px;
+				height: 80px;				
+			}
+			.lastMoveStart{
+				background: #FFF2CD;
+			}
+			.lastMoveEnd{
+				background: #F8DD92;
+			}
+			td.moveTo{
+				background: #FF6666;
+				cursor: pointer;
+				transition: 0.2s;
+			}
+			td.focus{
+				width: 78px;
+				height: 78px;
+				padding: 0;
+				border: 2px solid red;
+			}
+			td.keyboardClick{
+				width: 78px;
+				height: 78px;
+				padding: 0;
+				border: 2px solid red;
+			}
+			
+			
+			.caught_wrapper{
+				display: flex;
+				margin: 0 auto;
+			}
+			.caught{
+				border: 1px solid black;
+				height: 60px;
+				line-height: 60px;
+				width: 748px;
+				margin: 10px;
+				margin-top: -10px;
+				font-size: 50px;
+				
+				display:flex; 
+			}
+			.caught.LEFT{order: 1;}
+			.caught.RIGHT{order: 3;}
+			.caught p{ margin:0; }
+			.caught_mid{
+				border: 1px solid black;
+				width: 222px;
+				height: 60px;
+				line-height: 60px;
+				margin: 10px;
+				margin-top: -9px;
+				text-align: center;
+				order:2;
+			}
+			.caught_mid button{
+				margin: 5px;
+				line-height: 30px;
+				font-size: 20px;
+				border: 1px solid black;
+				padding: 0 5px 0 5px;
+				opacity: 0.4;
+				transition: 0.2s;
+			}
+			.caught_mid button:hover{ opacity: 1; }
+
+			.promotionBoard{
+				position: absolute;
+				top: 242px;
+				left: 650px;
+				border: 1px solid black;
+				width: 500px;
+				height: 300px;
+				margin: 0 auto;
+				background: white;
+				text-align: center;
+				z-index: 10000;
+			}
+			.promotionBoard .header{
+				height: 50px;
+				background: #DDD;
+				font-size: 25px;
+				line-height: 50px;
+			}
+			.promotionBoard button{
+				height: 200px;
+				font-size: 90px;
+				width: 90px;
+				margin:0 15px 0 15px; padding:0; border:0;
+				transition: 0.2s;
+			}
+			.promotionBoard h1{
+				line-height: 150px;
+				font-size: 100px;
+				letter-spacing: 10px;
+				-webkit-text-stroke: medium;
+			}
+			.blinder{
+				position: absolute;
+				background: transparent;
+				z-index: 10;
+				height: 850px;
+				width: 98%;
+			}
+			.pause{
+				line-height: 850px;
+				font-size: 200px;	
+				letter-spacing: 50px;
+				text-indent: 50px;
+				-webkit-text-stroke: medium;
+				background: black;
+				color: white;
+				text-align: center;
+				margin: 0 auto;
+				width: 100%;
+				height: 98vh;
+				transition: 0.8s;
+			}
+			
+
+			.checkMateBoard{
+				position: absolute;
+				top: 242px;
+				left: 650px;
+				border: 1px solid black;
+				width: 500px;
+				height: 300px;
+				margin: 0 auto;
+				background: white;
+				text-align: center;
+				z-index: 10000;			
+				
+			}
+			.whitewin{
+				background: white;
+				color: black;
+			}
+			.blackwin{
+				background: #242424;
+				color: white;
+			}
+			.checkMateBoard h1{
+				line-height: 150px;
+				font-size: 50px;
+				letter-spacing: 10px;
+				margin: 0 auto;
+				-webkit-text-stroke: medium;			
+			}
+			.checkMateBoard input{
+				height: 20px;
+				font-size: 15px;
+				text-align: center;
+			}
+			.checkMateBoard .winner{
+				font-size: 30px;
+				margin: 0 auto;
+				line-height: 40px;
+				font-weight: bold;
+			}
+			.checkMateBoard .record{
+				font-size: 20px;
+				margin: 0 auto;
+				line-height: 40px;
+				font-weight: bold;				
+			}
+			.checkMateBoard button{
+				height: 30px;
+				width: 120px;
+				font-size: 15px;
+				font-weight: 500;
+				background: white;
+				margin: 20px 10px 0 10px;
+				border: 1px solid black;
+				opacity: 0.5;
+			}
+			.checkMateBoard button:disabled{
+				background: #BFBFBF;
+			}
+			.checkMateBoard button:hover{
+				opacity: 0.9;
+			}
+
+			.BLACK{
+				color: black;
+			}
+			.WHITE{
+				
+				color: white;
+				text-shadow: 0px 0px 5px #000;
+				-webkit-text-stroke-color: black;
+				-webkit-text-stroke-width: 1px
+			}
+			body{
+				display: flex;
+			}
+			
+			
+			.timer1{
+				order:2;
+				border: black 1px solid;
+				width: 200px;
+				height: 150px;
+
+				z-index: -5000;
+				opacity: 0.9;
+				text-align: center;
+				transition: 1s;
+				margin: 10px auto;
+			}
+			.timer1.white{
+				background: white;
+				color: black;
+			}
+			.timer1.black{
+				background: black;
+				color: white;
+			}
+			.timer1.turn{
+				border: 4px solid red;
+				margin: 7px auto;				
+				transition: 0.4s;
+			}
+			.playerName{
+				font-size: 50px;
+				display: block;
+				font-weight: bold;
+			}
+			.turnTime{
+				font-size: 30px;
+				display: block;
+				font-weight: 600;
+			}
+			.dText{
+				font-size: 15px;
+			}
+			
+
+
+			.setting input[type='radio']{
+				-webkit-appearance: none !important;
+			}
+			.setting input[type='radio']:hover + p{
+				
+				opacity: 0.9
+			}
+			.setting input[type='radio'] + p{
+				opacity: 0.3;
+				font-size: 30px;
+				color: white;
+				margin: 3px;
+				padding: 12px;
+				border: red 3px solid;
+				transition: 0.2s;
+			}
+			.setting input[type='radio']:checked + p{
+				opacity: 0.8;
+				font-size: 30px;
+				padding: 12px;
+				border: red 3px solid;
+				color: red;
+				background: white;
+				text-shadow: none;
+			}
+			.setting input[type='radio'] + span{
+				display: none;
+			}
+			.setting input[type='radio']:checked + label{
+				display: block;
+			}
+			.tHeader{
+				font-size: 50px;
+				margin:0;
+			}
+			.setting .playerInfo{
+				width: 300px;
+				height: 300px;
+				border: 5px solid white;
+				margin: 100px;
+			}
+			.setting .playerInfo .overall{
+				margin: 20px 0 20px 0;
+			}
+			.setting .playerInfo h2{
+				font-size: 60px;
+				margin: 20px 0 40px 0;
+			}
+			.setting .playerInfo input{
+				width: 200px;
+				height: 50px;
+				font-size: 50px;
+				text-align: center;
+			}
+			.setting .black{
+				color: black;
+				text-shadow: 0 0 3px #FFF;
+				border: 5px solid black;
+				-webkit-text-stroke-width: medium;
+			}
+			
+			
+			#B3_footer{
+				display: inline;
+			}
+			.killList{
+				width: 750px; height: 100px;
+				border: 1px solid black;
+			}
+			.btnList{
+				width: 222px; height: 100px;
+				border: 1px solid black;
+			}
+			
+			
+			.cancelBtn{
+				position: absolute;
+				top: 10px;
+				right: 15px;
+				height: 25px;
+				width: 25px;
+				font-size: 15px;
+				line-height: 20px;
+				-webkit-text-stroke: thick;
+				border: 1px solid black;
+				padding: 0;
+				opacity: 0.5;
+				transition: 0.2s;
+			}
+			.cancelBtn:hover{ opacity: 1; }
+			
+			
+			@media screen and (min-width: 1800px){
+				.checkMateBoard{left: 709px;}
+				.promotionBoard{left: 709px;}
+			}
+			@media screen and (min-height: 970px){
+				.wrapper{margin-top: 120px;}
+				.checkMateBoard{top: 389px;}
+				.promotionBoard{top: 389px;}
+				.main{margin-top: 50px;	min-height: 900px;}
+			}
+		</style>
+		
+	</head>
+	<body>
+		<div id="B1" class = "main chessBackground">
+			<h1>NCC CHESS</h1>
+			<button onclick="document.getElementById('B1').style.display='none'; document.getElementById('B2').style.display='flex'">시작하기</button>
+			<label style="display: block; margin-top: 100px; font-size:20px;" for="darkmodeBtn">다크모드
+			<input id="darkmodeBtn" type="checkbox" style="width:18px; height:18px;"
+			onchange="let $B3 = document.getElementById('B3'); if(this.checked){$B3.classList.add('darkmode'); document.body.style.background='black'; localStorage.setItem('chess.darkmode', true);}
+			else{ $B3.classList.remove('darkmode'); document.body.style.background=''; localStorage.setItem('chess.darkmode', false);}"}></input></label>
+		</div>
+		<div id="B2" class = "main chessBackground setting" style="display:none">
+			<div id="player1" class="playerInfo white">
+				<p id="overallWHITE" class="overall"> </p>
+				<h2>백</h2>
+				<p>사용자 이름</p>
+				<input id="nameWHITE" value="Player1" onchange="GAME.InputChangeHandler(this.value, 'WHITE')" onkeydown="if(event.keyCode=='13')GAME.InputChangeHandler(this.value, 'WHITE')"></input>
+			</div>
+			<div id="timeOption">
+				<h2 class="tHeader">제한 시간 설정</h2>
+				<p>(각 플레이어에게 주어진 시간이며, 해당 시간을 모두 사용하면 패배합니다)</p>
+				<label for="t1"><input id="t1" type="radio" name="TIME" value=120><p>Bullet(초속기) - 02:00</p></input></label>
+				<label for="t2"><input id="t2" type="radio" name="TIME" value=300><p>Blitz(속기) - 05:00</p></input></label>
+				<label for="t3"><input id="t3" type="radio" name="TIME" value=600 checked><p>Rapid(기본) - 10:00</p></input></label>
+				<label for="t4"><input id="t4" type="radio" name="TIME" value=1800><p>Long - 30:00</p></input></label>
+				
+				<p style="margin-top: 30px;">플레이어 위치는 대국 시작 후에 변경 가능합니다</p>
+				<button onclick="GAME.Start()">대국 시작</button>
+			</div>
+			<div id="player2" class="playerInfo black">
+				<p id="overallBLACK" class="overall"> </p>
+				<h2>흑</h2>
+				<p>사용자 이름</p>
+				<input id="nameBLACK" value="Player2" onchange="GAME.InputChangeHandler(this.value, 'BLACK')" onkeydown="if(event.keyCode=='13')GAME.InputChangeHandler(this.value, 'BLACK')"></input>
+			</div>
+		</div>	
+		<div id="B3" style="display:none; margin: 0 auto">
+			<div id="gameBoardWrapper" class="wrapper">
+				<div id = "board" class="left">
+
+				</div>
+				
+				<div id = "mid">
+					<div id = "timerWHITE" class = "timer1 white">
+						<span id="p1" class = "playerName">Player1</span>
+						<span class = "dText">남은 시간</span>
+						<span class="turnTime" id="leftTimeWhite">05:00</span>
+						<span>전적: </span> <span id="p1Record">0승 0패 0무</span>
+					</div>
+
+					
+					<div id = "moveListLog" class="moveListBoard">
+						<ul id="log">
+						</ul>
+					</div>
+					
+					<div id = "timerBLACK" class = "timer1 black">
+						<span id="p2" class = "playerName">Player2</span>
+						<span class = "dText">남은 시간</span>
+						<span class = "turnTime" id="leftTimeBlack">05:00</span>
+						<span>전적: </span> <span id="p2Record">0승 0패 0무</span>
+					</div>			
+				</div>
+				
+				<div id = "boardR" class="right">
+				</div>
+			</div>
+			<div id="gameBoardCaughtChessMan" class="caught_wrapper">
+				<div class="caught LEFT" id="caught_WHITE"></div>
+				<div class="caught_mid"><button onclick="GAME.OpenMenu()" title="단축키 ESC">메뉴</button><button onclick="GAME.ToggleReverseMode()" title="단축키 R">↹</button><button onclick="GAME.Pause()" title="단축키 P">일시정지</button></div>
+				<div class="caught RIGHT" id="caught_BLACK"></div>
+			</div>
+			
+		</div>
+		
+		<script type = "text/javascript">
+		
+		let CURSELECT; //현재 이동할 말의 ID 요소
+		
+		
+		class TIMER{
+			constructor($timeSpan=null, time=3600, step=1000, type="M", mode="COUNTDOWN"){
+				this.$link = $timeSpan;
+				this.time = time;		//남은시간
+				this.mode = mode;		//COUNTDOWN - COUNTUP
+				this.type = type;		//HMS:시분초 MS:분초 HM:시분 ....
+				this.step = step;		//n 밀리초당 숫자 증가
+				this.fnElem = null;		//인터벌 요소 저장
+			}
+			off(){
+				clearInterval(this.fnElem);
+				this.fnElem = null;
+			}			
+			on(callBackFn){
+				if(this.fnElem != null) return;
+
+				this.fnElem = setInterval(()=>{
+					if(this.mode=="COUNTUP"){
+						this.time++;
+						callBackFn();
+						if(this.$link != null){	this.$link.innerText=this.getTimeStr();	}
+					}
+					else if(this.mode=="COUNTDOWN"){
+						this.time--;
+						callBackFn();
+						if(this.time < 0){ this.off(); return; }
+						if(this.$link != null){ this.$link.innerText=this.getTimeStr();	}
+					}
+				}, this.step);
+			}
+
+			setTime(time=0){ 
+				if(time<0) throw("Cannot put number under ZERO");
+				else{
+					this.time = time;
+					if(this.$link != null)
+					this.$link.innerText = this.getTimeStr();
+				}
+			}
+			getTime(){ return this.time; }
+			getTimeStr(type=this.type){ return TIMER.getTimeStr(this.getTime(), type); }
+			getStatement(){
+				if(this.fnElem) return "on"; else return "off";
+			}
+			
+			static getTimeStr(time_num, type){
+				if(time_num < 0) throw("Cannot put number under ZERO");
+				let H, M, S,result;
+				H = Math.floor(time_num/3600);
+				M = Math.floor(time_num/60);
+				S = Math.floor(time_num%60);
+				if(type=="H") return TIMER.getTime2Char(H)+":"+TIMER.getTime2Char(M)+":"+TIMER.getTime2Char(S);
+				else if(type =="M") return TIMER.getTime2Char((M+H*60))+":"+TIMER.getTime2Char(S);
+				else if(type =="S") return S+M*60+H*3600;
+			}
+			static getTime2Char(time){
+				if(time < 0) throw("Cannot put number under ZERO");
+				let result = parseInt(time);
+				if(result<10) return "0"+result;
+				else return ""+result;
+			}
+		}		
+		
+		
+		
+		/*말 이동할수 있는 좌표값*/
+		const GAME = {
+			MOVELIST: {
+				KING: [ [1,0], [-1,0], [0,1], [0,-1], [1,1], [1, -1], [-1, 1], [-1,-1] ],	//0:king
+				ROOK: [ [1,0], [-1,0], [0,1], [0,-1] ],										//1:rook
+				KNIGHT: [ [2,-1], [1,-2], [-1,-2], [-2,-1], [-2,1], [-1,2], [1,2], [2,1] ],	//2:knight
+				BISHOP: [ [1,1], [1, -1], [-1, 1], [-1,-1] ],								//3:bishop
+				QUEEN: [ [1,0], [-1,0], [0,1], [0,-1], [1,1], [1, -1], [-1, 1], [-1,-1] ],	//4:Queen
+				PAWN_BLACK: [ [1,0], [1, -1], [1, 1] ],										//5: black pawn
+				PAWN_WHITE: [ [-1,0], [-1, -1], [-1, 1] ], 									//6: white pawn
+				NONE: []
+			},
+			CHESSMANSPAN:{ KING:"♚", ROOK:"♜", KNIGHT:"♞", BISHOP:"♝", QUEEN:"♛", PAWN_BLACK:"♟", PAWN_WHITE:"♟", NONE:"" },
+			MAP:[[0, 0, 0, 0, 0, 0, 0, 0],
+				[0, 0, 0, 0, 0, 0, 0, 0],
+				[0, 0, 0, 0, 0, 0, 0, 0],
+				[0, 0, 0, 0, 0, 0, 0, 0],
+				[0, 0, 0, 0, 0, 0, 0, 0],
+				[0, 0, 0, 0, 0, 0, 0, 0],
+				[0, 0, 0, 0, 0, 0, 0, 0],
+				[0, 0, 0, 0, 0, 0, 0, 0]],
+			//-1: empty   0: black   1:white				
+			TURN: "WHITE",
+			ToggleTurn: function(){
+				if(this.TURN == "WHITE"){
+					this.TIMER["WHITE"].off();
+					this.TURN = "BLACK";
+					this.TIMER["BLACK"].on(GAME.IsTimeOver);
+					document.getElementById("timerWHITE").classList.remove("turn");
+					document.getElementById("timerBLACK").classList.add("turn");
+				}
+				else{
+					this.TIMER["BLACK"].off();
+					this.TURN = "WHITE";
+					this.TIMER["WHITE"].on(GAME.IsTimeOver);
+					document.getElementById("timerWHITE").classList.add("turn");
+					document.getElementById("timerBLACK").classList.remove("turn");					
+				}
+			},
+			RenderBoard: function($divDom){
+				for(let i=0; i<$divDom.childElementCount; ++i){ $divDom.children[i].remove(); }
+				let newTable, newTr, newTd;
+				const rowElem = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', ''];
+				newTable = document.createElement("table");
+				
+				//first column
+				newTr = document.createElement("tr");				
+				newTd = document.createElement("td");
+				newTd.classList.add("labelColumn"); newTd.classList.add("labelRow");
+				newTr.append(newTd);				
+				for(let j=0; j<8; ++j){
+					newTd = document.createElement("td");
+					newTd.classList.add("labelRow"); newTd.classList.add("reverse"); newTd.innerHTML = rowElem[j];
+					newTr.append(newTd);
+				}
+				newTable.append(newTr);
+
+				for(let i=0; i<8; ++i){
+					//left
+					newTr = document.createElement("tr");
+					newTd = document.createElement("td");
+					newTd.classList.add("labelRow"); newTd.innerHTML = 8-i;
+					newTr.append(newTd);
+					
+					//mid
+					for(let j=0; j<8; ++j){
+						newTd = document.createElement("td");
+						newTd.id = (i+1)+""+(j+1);
+						if(i%2){ if(j%2){ newTd.classList.add("wt"); } else{ newTd.classList.add("bl"); } }
+						else{ if(j%2){ newTd.classList.add("bl"); }	else{ newTd.classList.add("wt"); } }
+						newTr.append(newTd);
+					}
+					//right
+					newTd = document.createElement("td");
+					newTd.classList.add("labelRow"); newTd.classList.add("reverse"); newTd.innerHTML = 8-i;
+					newTr.append(newTd);
+					newTable.append(newTr);	
+				}
+				//last column
+				newTr = document.createElement("tr");
+				newTd = document.createElement("td");
+				newTd.classList.add("labelColumn"); newTd.classList.add("labelRow");
+				newTr.append(newTd);
+				for(let j=0; j<8; ++j){
+					newTd = document.createElement("td");
+					newTd.classList.add("labelRow"); newTd.innerHTML = rowElem[j];
+					newTr.append(newTd);
+				}
+				newTable.append(newTr);
+				$divDom.append(newTable);
+			},
+			RenderReverseBoard: function($divDom){
+				this.RenderBoard($divDom);
+				$divDom.classList.add("reverse");
+				$TABLE = $divDom.children[0];
+				for(let i=8; i>0; --i){ //col
+					for(let j=8; j>0; --j){ //row
+						let $td = $TABLE.children[i].children[j];
+						$td.id = i+""+j+"R"
+						$td.classList.add("reverse");
+						$td.innerHTML = document.getElementById($td.id[0]+$td.id[1]).innerHTML;
+					}
+				}
+			},
+			Pause: function(){
+				let $PAUSE = document.getElementById("pause");
+				if(!$PAUSE){
+					this.TIMER[this.TURN].off();				
+					$PAUSE = document.createElement("div");
+					$PAUSE.classList.add("blinder");
+					$PAUSE.classList.add("pause");
+					$PAUSE.innerHTML = "PAUSED";
+					$PAUSE.id="pause";
+					$PAUSE.style.opacity="0";
+					
+					let $BTN = document.createElement("button");
+					$BTN.className = "cancelBtn";
+					$BTN.innerText = "X"
+					$BTN.onclick=function(){ GAME.Pause(); }
+					
+					$PAUSE.appendChild($BTN);
+					document.body.appendChild($PAUSE);
+					
+					setTimeout(function(){$PAUSE.style.opacity=1;}, 0);
+				}
+				else{
+					this.TIMER[this.TURN].on(GAME.IsTimeOver);				
+					$PAUSE.style.opacity=0;
+					$PAUSE.style.transition="0.4s";
+					setTimeout(function(){$PAUSE.remove();}, 400);
+				}
+				return $PAUSE;
+			},
+			Initialize: function(){
+				this.MAP =
+				[[0, 0, 0, 0, 0, 0, 0, 0],
+				[0, 0, 0, 0, 0, 0, 0, 0],
+				[0, 0, 0, 0, 0, 0, 0, 0],
+				[0, 0, 0, 0, 0, 0, 0, 0],
+				[0, 0, 0, 0, 0, 0, 0, 0],
+				[0, 0, 0, 0, 0, 0, 0, 0],
+				[0, 0, 0, 0, 0, 0, 0, 0],
+				[0, 0, 0, 0, 0, 0, 0, 0]];			
+			
+				this.TURN = "WHITE";
+				
+				this.MAP[0][0]=new chessMan("ROOK", "BLACK", 1, 1, 1, POSITION.getSpan(1,1));
+				this.MAP[0][1]=new chessMan("KNIGHT", "BLACK", 1, 2, 1, POSITION.getSpan(1,2));
+				this.MAP[0][2]=new chessMan("BISHOP", "BLACK", 1, 3, 1, POSITION.getSpan(1,3));
+				this.MAP[0][3]=new chessMan("QUEEN", "BLACK", 1, 4, 1, POSITION.getSpan(1,4));
+				this.MAP[0][4]=new chessMan("KING", "BLACK", 1, 5, 1, POSITION.getSpan(1,5));
+				this.MAP[0][5]=new chessMan("BISHOP", "BLACK", 1, 6, 2, POSITION.getSpan(1,6));
+				this.MAP[0][6]=new chessMan("KNIGHT", "BLACK", 1, 7, 2, POSITION.getSpan(1,7));
+				this.MAP[0][7]=new chessMan("ROOK", "BLACK", 1, 8, 2, POSITION.getSpan(1,8));
+				for(let i=0; i<8; i++){
+					this.MAP[1][i] = new chessMan("PAWN_BLACK", "BLACK", 2, i+1, i+1, POSITION.getSpan(2,i+1));
+					this.MAP[6][i] = new chessMan("PAWN_WHITE", "WHITE", 7, i+1, i+1, POSITION.getSpan(7,i+1));
+				}
+				this.MAP[7][0]=new chessMan("ROOK", "WHITE", 8, 1, 1, POSITION.getSpan(8,1));
+				this.MAP[7][1]=new chessMan("KNIGHT", "WHITE", 8, 2, 1, POSITION.getSpan(8,2));
+				this.MAP[7][2]=new chessMan("BISHOP", "WHITE", 8, 3, 1, POSITION.getSpan(8,3));
+				this.MAP[7][3]=new chessMan("QUEEN", "WHITE", 8, 4, 1, POSITION.getSpan(8,4));
+				this.MAP[7][4]=new chessMan("KING", "WHITE", 8, 5, 1, POSITION.getSpan(8,5));
+				this.MAP[7][5]=new chessMan("BISHOP", "WHITE", 8, 6, 2, POSITION.getSpan(8,6));
+				this.MAP[7][6]=new chessMan("KNIGHT", "WHITE", 8, 7, 2, POSITION.getSpan(8,7));
+				this.MAP[7][7]=new chessMan("ROOK", "WHITE", 8, 8, 2, POSITION.getSpan(8,8));
+				
+				/* 해당 좌표를 클릭했을때 해당 칸으로 말을 이동시키는 함수 */
+				for(var i = 1; i <= 8; ++i)
+					for(var j = 1; j <= 8; ++j){
+						document.getElementById(i + "" + j).addEventListener("click", function(){
+							//if($("#" + this.id[0] + this.id[1]).hasClass("moveTo")){
+							if(document.getElementById(this.id[0] + this.id[1]).classList.contains("moveTo")){
+								if(GAME.SELECTED.type=="KING"){
+									let col;
+									if(GAME.SELECTED.color=="WHITE") col="8"; else col = "1";
+									if(GAME.SELECTED.canQueenSideCastle && this.id==col+"3"){
+										GAME.SELECTED.castlingWithAnimation("QUEEN");
+										return;
+									}
+									if(GAME.SELECTED.canKingSideCastle && this.id==col+"7"){
+										GAME.SELECTED.castlingWithAnimation("KING");
+										return;
+									}
+								}	
+								else if(GAME.SELECTED.type=="PAWN_BLACK"&&this.id[0]=="8"){ //last fixed
+									GAME.OpenPromotionBoard(GAME.SELECTED);
+								}
+								else if(GAME.SELECTED.type=="PAWN_WHITE"&&this.id[0]=="1"){
+									GAME.OpenPromotionBoard(GAME.SELECTED);
+								}
+								GAME.SELECTED.moveWithAnimation(this.id[0], this.id[1]);
+							}
+						});
+					}
+								
+				GAME.SetAllNextMoveList();
+			},
+			SetTestMode: function(){
+				this.RenderBoard(board);
+				this.MAP[0][0]=new chessMan("ROOK", "BLACK", 1, 1, 1, POSITION.getSpan(1,1));
+				this.MAP[0][4]=new chessMan("KING", "BLACK", 1, 5, 1, POSITION.getSpan(1,5));
+				this.MAP[0][7]=new chessMan("ROOK", "BLACK", 1, 8, 2, POSITION.getSpan(1,8));
+				this.MAP[7][0]=new chessMan("ROOK", "WHITE", 8, 1, 1, POSITION.getSpan(8,1));
+				this.MAP[7][4]=new chessMan("KING", "WHITE", 8, 5, 1, POSITION.getSpan(8,5));
+				this.MAP[7][7]=new chessMan("ROOK", "WHITE", 8, 8, 2, POSITION.getSpan(8,8));
+			},
+			SetAllNextMoveList: function(){
+				for(let i=0; i<8; ++i)
+					for(let j=0; j<8; ++j)
+						if(typeof(this.MAP[i][j])=="object") this.MAP[i][j].setNextMoveList();
+						
+				let elem = this.GetCheckMateElem();
+				if(elem != "NONE") this.Over(elem);
+			},
+			Over: function(elem){
+				this.TIMER["WHITE"].off();
+				this.TIMER["BLACK"].off();
+				if(elem == "CHECKMATE" || elem == "기권"){
+					if(this.TURN=="BLACK"){ //white win
+						this.OVERALL["WHITE"][0]++;
+						this.OVERALL["BLACK"][1]++;
+					}
+					else{
+						this.OVERALL["WHITE"][1]++;
+						this.OVERALL["BLACK"][0]++;
+					}
+				}
+				else if(elem == "STALEMATE" || elem == "무승부"){
+					this.OVERALL["WHITE"][2]++;
+					this.OVERALL["BLACK"][2]++;
+				}
+				this.SetOverall(this.OVERALL["WHITE"], "WHITE");
+				this.SetOverall(this.OVERALL["BLACK"], "BLACK");
+				this.CheckMateMsg(elem);
+				GAME.ToggleBlinder("on");
+			},
+			OVERALL:{
+				WHITE: [0,0,0],
+				BLACK: [0,0,0]
+			},
+			InputChangeHandler: function(key, color, DOM){
+				let $P1 = document.getElementById("nameWHITE");
+				let $P2 = document.getElementById("nameBLACK");
+				if($P1.value == $P2.value){ $P2.value = "Player2"; return; }
+				if($P1.value == ""){ $P1.value = "Player1"; return; }
+				if($P2.value == ""){ $P2.value = "Player2"; return; }
+				
+				document.getElementById("overall"+color).innerHTML = "전적 : " + this.GetOverallStr(this.LoadOverall(key, color), "overall")
+			},
+			SetOverall: function(overall=[0,0,0], color="WHITE"){
+				if(color==="WHITE"){ 
+					document.getElementById("p1Record").innerText = this.GetOverallStr(overall, "overall");
+					this.SaveOverall(document.getElementById("p1").innerText, color);
+				}
+				else if(color==="BLACK"){
+					document.getElementById("p2Record").innerText = this.GetOverallStr(overall, "overall");
+					this.SaveOverall(document.getElementById("p2").innerText, color);
+				}
+			},
+			GetOverallStr: function(color="WHITE", mode="color"){
+				if(mode==="color"){ let t = this.OVERALL[color]; return t[0]+"승 "+t[1]+"패 "+t[2]+"무";}
+				else if(mode==="overall"){ return color[0]+"승 "+color[1]+"패 "+color[2]+"무" };
+			},
+			SaveOverall: function(key="UNKNOWN", color="WHITE"){
+				localStorage.setItem("chess."+key, this.OVERALL[color]);
+			},
+			LoadOverall: function(key="UNKNOWN", color="WHITE", DOM=null){
+				let val = localStorage.getItem("chess."+key);
+				if(val == null){
+					if(DOM!=null){ DOM.innerText="0승 0패 0무"; }
+					this.OVERALL[color]=[0,0,0];
+					return [0,0,0];
+				}
+				
+				let win, lose, draw;
+				val = val.split(",");
+				win=parseInt(val[0]);
+				lose=parseInt(val[1]);
+				draw=parseInt(val[2]);
+				this.OVERALL[color]=[win,lose,draw];
+				if(DOM!=null){ DOM.innerText=win+"승 "+lose+"패 "+draw+"무"; }
+				
+				return [win, lose, draw];				
+			},
+			KingPossibleMove: [[1, 1, 1, 1, 1, 1, 1, 1],
+				[1, 1, 1, 1, 1, 1, 1, 1],
+				[1, 1, 1, 1, 1, 1, 1, 1],
+				[1, 1, 1, 1, 1, 1, 1, 1],
+				[1, 1, 1, 1, 1, 1, 1, 1],
+				[1, 1, 1, 1, 1, 1, 1, 1],
+				[1, 1, 1, 1, 1, 1, 1, 1],
+				[1, 1, 1, 1, 1, 1, 1, 1]],
+			KingCheck: function(mode){
+				let movelist = [];
+				this.KingPossibleMove = [[1, 1, 1, 1, 1, 1, 1, 1],
+				[1, 1, 1, 1, 1, 1, 1, 1],
+				[1, 1, 1, 1, 1, 1, 1, 1],
+				[1, 1, 1, 1, 1, 1, 1, 1],
+				[1, 1, 1, 1, 1, 1, 1, 1],
+				[1, 1, 1, 1, 1, 1, 1, 1],
+				[1, 1, 1, 1, 1, 1, 1, 1],
+				[1, 1, 1, 1, 1, 1, 1, 1]];
+				for(let i=0; i<8; ++i){
+					for(let j=0; j<8; ++j){
+						let elem = this.MAP[i][j];
+						if(elem != 0 && elem != -1 && elem.color != this.TURN){
+							if(elem.type.indexOf("PAWN")>-1){
+								for(let p=1; p<=2; ++p){ //폰 특수행마법
+									let val=[elem.column + elem.moveList[p][0], elem.row + elem.moveList[p][1]];
+									if(POSITION.isValid(val[0], val[1])) movelist.push(val);
+								}
+							}
+							else movelist = movelist.concat(elem.getPossibleMove("CHECK"));
+						}
+					}
+				}
+				
+				for(let i=0; i<movelist.length; ++i){
+					this.KingPossibleMove[movelist[i][0]-1][movelist[i][1]-1] = 0;
+				}
+				
+				
+				if(!this.KingPossibleMove[this.KINGPOS[this.TURN][0]-1][this.KINGPOS[this.TURN][1]-1]){
+					if(mode==true) this.CheckMsg();
+					return true;
+				}
+				return false;
+			},
+			KINGPOS:{
+				WHITE: [8,5],
+				BLACK: [1,5]
+			},
+			SCORE:{
+				WHITE: 0,
+				BLACK: 0,
+				$Link:{
+					WHITE: null,
+					BLACK: null
+				},
+				
+				Set: function(color, score){ this[color]=score; },
+				SetLink: function(color, $DOM){ this.$Link[color] = $DOM; },
+				
+				Get: function(color){ return this[color]; },
+				
+				Init: function(){ 
+					this["WHITE"]=0; this["BLACK"]=0;
+					this.$Link["WHITE"] = document.getElementById("caught_WHITE");
+					this.$Link["BLACK"] = document.getElementById("caught_BLACK");
+				},
+				Add: function(color, score){ this[color]+=score; },
+				AddElement: function(color, $elem){
+					if(this.$Link[color] != null){
+						let pos = $elem.id;
+						pos = [parseInt(pos[0]), parseInt(pos[1])];
+						this.Add(color, GAME.MAP[pos[0]-1][pos[1]-1].getScore());
+						this.$Link[color].appendChild($elem.children[0]);
+						this.Renew();
+					}
+				},
+				Renew: function(){
+					let $GAP = null;
+					let Superior = null;
+					if(document.getElementById("gap")!=null) document.getElementById("gap").remove();
+					if(this.WHITE > this.BLACK){
+						$GAP = document.createElement("p"); $GAP.id="gap"; $GAP.style.fontSize="28px";
+						$GAP.innerHTML = "+" + (this.WHITE - this.BLACK);
+						Superior = "WHITE";
+					}
+					else if(this.WHITE < this.BLACK){
+						$GAP = document.createElement("p"); $GAP.id="gap"; $GAP.style.fontSize="28px";
+						$GAP.innerHTML = "+" + (this.BLACK - this.WHITE);
+						Superior = "BLACK";
+					}
+					
+					if($GAP != null) this.$Link[Superior].appendChild($GAP);				
+				
+				},
+				Sub: function(color, score){ this[color]-=score; this.Renew(); }
+			},
+			SetKingPos: function(color, col, ro){
+				if(POSITION.isValid(col, ro))
+					this.KINGPOS[color] = [col,ro];
+			},
+			GetKingPos: function(color){
+				for(let i=0; i<8; ++i){
+					for(let j=0; j<8; ++j){
+						if(this.MAP[i][j].type == "KING" && this.MAP[i][j].color == color)
+							return [i+1,j+1];
+					}
+				}
+				console.log("Cannot find the KING");
+			},
+			GetCheckMateElem: function(color=this.TURN){
+				let canMoveCnt = 0;
+				let pos = this.KINGPOS[color];
+				for(let i=0; i<8; ++i){
+					for(let j=0; j<8; ++j){
+						if(this.MAP[i][j].color == color)
+							canMoveCnt += this.MAP[i][j].nextMoveList.length;
+					}
+				}
+				
+				this.KingCheck(false);
+				
+				if(canMoveCnt == 0){
+					if(!this.KingPossibleMove[pos[0]-1][pos[1]-1]){ //checkmate
+						return "CHECKMATE";
+					}
+					else{	//무승부
+						return "STALEMATE";
+					}
+				}
+				return "NONE";
+			},
+			CheckMateMsg: function(elem){
+				let $MSGBOX = document.createElement("div");
+				$MSGBOX.className = "checkMateBoard";
+				$MSGBOX.id = "checkMateBoard";
+
+				let $MSG = document.createElement("h1");
+				$MSG.innerHTML = elem + "!";
+				
+				let $P2 = document.createElement("p");
+				$P2.innerText = "전적: ";
+				$P2.className = "record";				
+				
+				let winner;
+				if(this.TURN=="BLACK"){ winner="p1"; $MSGBOX.classList.add("whitewin"); $P2.innerText += this.GetOverallStr("WHITE");}
+				else{ winner="p2"; $MSGBOX.classList.add("blackwin"); $P2.innerText += this.GetOverallStr("BLACK");}
+
+				let $P1 = document.createElement("p");
+				$P1.innerHTML = document.getElementById(winner).innerText + " Win!";
+				$P1.className = "winner";				
+
+				let $Btn1 = document.createElement("button");
+				$Btn1.innerHTML = "재경기";
+				$Btn1.onclick = ()=>{GAME.Start(); $MSGBOX.remove(); GAME.ToggleBlinder("off");}
+				
+				let $Btn2 = document.createElement("button");
+				$Btn2.innerHTML = "처음으로";
+				$Btn2.onclick = ()=>{$MSGBOX.remove(); GAME.ToggleBlinder("off"); document.getElementById("B3").style.display='none'; document.getElementById("B1").style.display='block';}
+				
+				$MSGBOX.append($MSG);
+				$MSGBOX.append($P1);
+				$MSGBOX.append($P2);
+				$MSGBOX.append($Btn1);
+				$MSGBOX.append($Btn2);
+				document.body.append($MSGBOX);
+				GAME.ToggleBlinder("on");
+			},
+			OpenMenu: function(){
+				GAME.ToggleBlinder("on");
+				let $MENU = document.getElementById("menu");
+				if($MENU){ $MENU.remove(); 	GAME.ToggleBlinder("off"); return; }
+				
+				let $BOX = document.createElement("div");
+				$BOX.className = "checkMateBoard";
+				$BOX.id="menu";
+				let $MSG = document.createElement("h1");
+				$MSG.innerHTML = "MENU";
+				let $Btn1 = document.createElement("button");
+				$Btn1.innerHTML = "기권";
+				$Btn1.onclick = ()=>{$BOX.remove(); GAME.Over("기권"); }
+				
+				let $Btn2 = document.createElement("button");
+				$Btn2.innerHTML = "무르기";
+				$Btn2.onclick = ()=>{$BOX.remove(); this.RequestUndo(); }
+				if(this.LOG.length < 1) $Btn2.disabled = true;
+				
+				let $Btn3 = document.createElement("button");
+				$Btn3.innerHTML = "무승부";
+				$Btn3.onclick = ()=>{$BOX.remove(); GAME.Over("무승부"); }				
+				
+				let $Btn4 = document.createElement("button");
+				$Btn4.innerHTML = "취소";
+				$Btn4.onclick = ()=>{ GAME.OpenMenu(); }
+				
+				$BOX.append($MSG);
+				$BOX.append($Btn1);
+				$BOX.append($Btn2);
+				$BOX.append($Btn3);
+				$BOX.append($Btn4);
+				document.body.append($BOX);				
+			},
+			CheckMsg: function(){
+				let $MSGBOX = document.createElement("div");
+				$MSGBOX.className = "promotionBoard";
+				let $MSG = document.createElement("h1");
+				$MSG.innerHTML = "CHECK!";
+				$MSGBOX.append($MSG);
+				document.body.append($MSGBOX);
+
+				
+				$MSGBOX.style.transition = "1s";
+				setTimeout(function(){$MSGBOX.style.opacity = "0";}, 1000);
+				setTimeout(function(){$MSGBOX.remove();}, 2000);
+			},
+			TYPE: ["KING", "ROOK", "KNIGHT", "BISHOP", "QUEEN", "PAWN_BLACK", "PAWN_WHITE", "EN_PASSING"],
+			SELECTED: null,
+			ToggleBlinder: function(val){
+				if(val=="on"){
+					let t = document.getElementById("blinder");
+					if(t){ return; }
+					
+					let $blinder = document.createElement("div");
+					$blinder.classList.add("blinder");
+					$blinder.id = "blinder";
+					document.body.append($blinder);
+					return;
+				}
+				else if(val=="off"){
+					let t = document.getElementById("blinder");
+					if(t){ t.remove(); return; }
+				}
+				
+				let t = document.getElementById("blinder");
+				if(t){ t.remove(); return; }
+				
+				let $blinder = document.createElement("div");
+				$blinder.classList.add("blinder");
+				$blinder.id = "blinder";
+				document.body.append($blinder);
+			},
+			OpenPromotionBoard: function(PROMOTION_PAWN){
+				let $mainBoard = document.createElement("div");
+				$mainBoard.classList.add("promotionBoard");
+				let $header1 = document.createElement("div");
+				$header1.classList.add("header");
+				$header1.innerHTML = "승급할 기물 선택";
+				$mainBoard.append($header1);
+				let $chessManList = document.createElement("div");
+				
+				this.ToggleBlinder("on");
+				
+				for(let i=1; i<5; i++){
+					let $btn = document.createElement("button");
+					let $p = chessMan.createChessManSpan(GAME.TYPE[i], PROMOTION_PAWN.color, "_promoted");
+					$p.style.margin = "0px";
+					$btn.appendChild($p);
+					$btn.onclick = function(){
+						PROMOTION_PAWN.promotion(GAME.TYPE[i]);
+						$mainBoard.remove();
+						GAME.ToggleBlinder("off");
+						GAME.CopyBoard();
+					}
+					$chessManList.append($btn);
+				}
+				$mainBoard.append($chessManList);
+				let $header2 = document.createElement("div");
+				$header2.classList.add("header");
+				$header2.innerHTML = "선택 즉시 해당 기물로 승급합니다";
+				$mainBoard.append($header2);
+				document.body.append($mainBoard);
+			},
+			LOG: [],	//[ MOVEMENT, KILLEDELEMENT ]
+			ClearLog: function(){
+				this.LOG.splice(0, this.LOG.length);
+				let UL = document.getElementById("log");
+				while(UL.childElementCount > 0){
+					UL.children[0].remove();
+				}
+			},
+			
+			AddLog: function(CHESSMAN, origPos, targetPos, moveStatement, KILLED=null){
+				let UT;
+				let UL = document.getElementById("log");
+				let LI = document.createElement("li");
+			
+				if(CHESSMAN == "CASTLING_QUEEN"){
+					UT="O-X-O";
+					UL.removeChild(UL.lastElementChild); UL.removeChild(UL.lastElementChild);
+					this.LOG.pop(); this.LOG.pop();
+					this.LOG.push([UT]);
+					LI.innerHTML = UT;
+					UL.appendChild(LI);
+					if(GAME.TURN=="BLACK")
+						LI.classList.add("black");
+						
+					for(let i=0; i<UL.childElementCount-1; ++i){
+						UL.children[i].classList.remove("lastMoveEnd");
+						UL.children[i].classList.remove("lastMoveStart");
+						if(i%2)UL.children[i].classList.add("black");
+					}
+					if(this.LOG.length%2) UL.lastElementChild.className= "lastMoveStart";
+					else UL.lastElementChild.className= "lastMoveEnd";						
+						return;
+				}
+				else if(CHESSMAN =="CASTLING_KING"){
+					UT="O-O";
+					UL.removeChild(UL.lastElementChild); UL.removeChild(UL.lastElementChild);
+					this.LOG.pop(); this.LOG.pop();
+					this.LOG.push([UT]);
+					LI.innerHTML = UT;
+					UL.appendChild(LI);
+					if(GAME.TURN=="BLACK")
+						LI.classList.add("black");
+						
+					for(let i=0; i<UL.childElementCount-1; ++i){
+						UL.children[i].classList.remove("lastMoveEnd");
+						UL.children[i].classList.remove("lastMoveStart");
+						if(i%2)UL.children[i].classList.add("black");
+					}
+					if(this.LOG.length%2) UL.lastElementChild.className= "lastMoveStart";
+					else UL.lastElementChild.className= "lastMoveEnd";						
+						return;
+				}
+			
+			
+				let movement={
+					ROW:[0,"a","b","c","d","e","f","g","h"],
+					COL:[0,8,7,6,5,4,3,2,1]
+				}
+				let result;
+				UT = CHESSMAN.type;
+				
+				if(UT.indexOf("PAWN")>-1){
+					if(KILLED != null) UT = movement["ROW"][origPos[1]];
+					else UT = "";
+				}
+				else if(UT == "KNIGHT") UT="N";				
+				else UT = UT[0];
+				result = UT;
+				
+				if(KILLED != null){
+					result+="x";
+				}
+				if(UT.indexOf("CASTLING" < 0)){
+					result+=movement["ROW"][targetPos[1]];
+					result+=movement["COL"][targetPos[0]];
+				}
+				//MID::LOGLIST
+				
+				
+				if(CHESSMAN.color=="BLACK")
+					LI.classList.add("black");
+					
+				LI.innerHTML = result;
+				UL.appendChild(LI);
+				UL.parentElement.scrollTop = LI.offsetTop;
+				for(let i=0; i<UL.childElementCount-1; ++i){
+					UL.children[i].classList.remove("lastMoveEnd");
+					UL.children[i].classList.remove("lastMoveStart");
+					if(i%2)UL.children[i].classList.add("black");
+				}
+				if(this.LOG.length%2) UL.lastElementChild.className= "lastMoveStart";
+				else UL.lastElementChild.className= "lastMoveEnd";				
+
+				
+				this.LOG.push([CHESSMAN, origPos, targetPos, moveStatement, KILLED]);
+				//		this.LOG.push(CHESSMAN, origPos, MoveStatement, KILLED);
+			},
+			Undo: function(){ //캐슬링 만들어야됨 
+				let elem, CHESSMAN, origPos, targetPos, moveStatement, KILLED;
+				let UL = document.getElementById("log");				
+				if(this.LOG.length < 1) return;
+				UL.removeChild(UL.lastElementChild);
+				elem = this.LOG.pop();
+				
+				if(elem.length==1){
+					if(elem[0]==="O-O"){
+						if(this.LOG.length%2 == 0){
+							GAME.MAP[7][6].moveWithAnimation(8,5); GAME.MAP[7][5].moveWithAnimation(8,8); 
+							setTimeout(()=>{GAME.MAP[7][4].isMoved=false; GAME.MAP[7][7].isMoved=false;}, 300) } //white
+						else{ GAME.MAP[0][6].moveWithAnimation(1,5); GAME.MAP[0][5].moveWithAnimation(1,8);
+							setTimeout(()=>{GAME.MAP[0][4].isMoved=false; GAME.MAP[0][7].isMoved=false;}, 300) } //black
+					}
+					else if(elem[0]==="O-X-O"){
+						if(this.LOG.length%2 == 0){ GAME.MAP[7][2].moveWithAnimation(8,5); GAME.MAP[7][3].moveWithAnimation(8,1);
+							setTimeout(()=>{GAME.MAP[7][4].isMoved=false; GAME.MAP[7][0].isMoved=false;}, 300) }
+						else{ GAME.MAP[0][2].moveWithAnimation(1,5); GAME.MAP[0][3].moveWithAnimation(1,1);
+							setTimeout(()=>{GAME.MAP[0][4].isMoved=false; GAME.MAP[0][0].isMoved=false;}, 300) }
+					}
+					
+					setTimeout(()=>{
+						let UL = document.getElementById("log");
+						this.LOG.pop(); this.LOG.pop();
+						UL.removeChild(UL.lastElementChild);
+						UL.removeChild(UL.lastElementChild);						
+
+						POSITION.clearLastMovedClassOnMap();
+						POSITION.clearMoveToClassOnMap();		
+					
+						if(this.LOG.length > 0){
+							let lastElem = this.LOG[this.LOG.length-1];
+							if(lastElem == "O-O"){
+								if(this.LOG.length%2 != 0){ POSITION.getElem(8,5).classList.add("lastMoveStart"); POSITION.getElem(8,7).classList.add("lastMoveEnd"); }
+								else{ POSITION.getElem(1,5).classList.add("lastMoveStart"); POSITION.getElem(1,7).classList.add("lastMoveEnd"); }
+							}
+							else if(lastElem == "O-X-O"){
+								if(this.LOG.length%2 != 0){ POSITION.getElem(8,5).classList.add("lastMoveStart"); POSITION.getElem(8,3).classList.add("lastMoveEnd"); }
+								else{ POSITION.getElem(1,5).classList.add("lastMoveStart"); POSITION.getElem(1,3).classList.add("lastMoveEnd"); }							
+							}
+							else{
+								document.getElementById(POSITION.getId([lastElem[0].column, lastElem[0].row])).classList.add("lastMoveStart");
+								document.getElementById(POSITION.getId([lastElem[1][0], lastElem[1][1]])).classList.add("lastMoveEnd");
+							}
+						}
+						GAME.SELECTED = null;
+						GAME.ToggleTurn();
+						GAME.KingCheck(true);
+						GAME.SetAllNextMoveList();
+						GAME.ReverseBoard();
+					}, 300);
+					
+					return;
+				}
+				
+				CHESSMAN = elem[0];	origPos = elem[1]; targetPos = elem[2]; moveStatement = elem[3]; KILLED = elem[4];
+				//elem = [CHESSMAN, origPos[], MoveStatement, KILLED]
+				//	cf: [O-O], [O-X-O]
+
+				//animation
+				let moveX, moveY, objBox, targetBox, reverseObj;
+				objBox = document.getElementById(POSITION.getId([CHESSMAN.column, CHESSMAN.row]));
+				targetBox = document.getElementById(POSITION.getId(origPos));
+				reverseObj = document.getElementById(objBox.id + "R").firstElementChild;
+				moveX = objBox.offsetLeft - targetBox.offsetLeft ;
+				moveY = objBox.offsetTop - targetBox.offsetTop;
+				if(GAME.TURN == "WHITE"){ moveX = -moveX; moveY = -moveY; }
+				CHESSMAN.$link.style.transform = "translate(" + moveX + "px," + moveY + "px)";
+				reverseObj.style.transform = "translate(" + (-moveX) + "px," + (-moveY) + "px)";
+				
+				
+				setTimeout(()=>{
+					CHESSMAN.$link.style.transform =""; reverseObj.style.transform="";
+						
+					document.getElementById(POSITION.getId(origPos)).appendChild(CHESSMAN.$link);
+					this.MAP[CHESSMAN.column-1][CHESSMAN.row-1] = 0;	
+					if(KILLED != null){
+						this.MAP[KILLED.column-1][KILLED.row-1] = KILLED;
+						document.getElementById(POSITION.getId([KILLED.column, KILLED.row])).appendChild(KILLED.$link);
+						GAME.SCORE.Sub(CHESSMAN.color, KILLED.getScore());
+					}
+					else{
+						document.getElementById(POSITION.getId([CHESSMAN.column, CHESSMAN.row])).innerHTML = "";
+					}					
+
+
+					CHESSMAN.column = origPos[0]; CHESSMAN.row = origPos[1];
+					this.MAP[CHESSMAN.column-1][CHESSMAN.row-1] = CHESSMAN;
+					CHESSMAN.isMoved = moveStatement;	
+					
+					POSITION.clearLastMovedClassOnMap();
+					POSITION.clearMoveToClassOnMap();		
+					
+					if(this.LOG.length > 0){
+						let lastElem = this.LOG[this.LOG.length-1];
+						if(lastElem == "O-O"){
+							if(this.LOG.length%2 == 0){ POSITION.getElem(8,5).classList.add("lastMoveStart"); POSITION.getElem(8,7).classList.add("lastMoveEnd"); }
+							else{ POSITION.getElem(1,5).classList.add("lastMoveStart"); POSITION.getElem(1,7).classList.add("lastMoveEnd"); }
+						}
+						else if(lastElem == "O-X-O"){
+							if(this.LOG.length%2 == 0){ POSITION.getElem(8,5).classList.add("lastMoveStart"); POSITION.getElem(8,3).classList.add("lastMoveEnd"); }
+							else{ POSITION.getElem(1,5).classList.add("lastMoveStart"); POSITION.getElem(1,3).classList.add("lastMoveEnd"); }
+						}
+						else{
+							document.getElementById(POSITION.getId([lastElem[0].column, lastElem[0].row])).classList.add("lastMoveStart");
+							document.getElementById(POSITION.getId([lastElem[1][0], lastElem[1][1]])).classList.add("lastMoveEnd");
+						}
+					}
+					
+					GAME.SELECTED = null;
+					GAME.ToggleTurn();
+					GAME.KingCheck(true);
+					GAME.SetAllNextMoveList();
+					GAME.ReverseBoard();
+				}, 300);
+			},
+			ReverseMode: false,
+			ToggleReverseMode:function(){
+				let $L = document.getElementById("board");
+				let $R = document.getElementById("boardR");		
+				let $Lc = document.getElementById("caught_WHITE");
+				let $Rc = document.getElementById("caught_BLACK");
+				
+				if(this.ReverseMode){
+					if($L.classList.contains("reverse")){
+						$L.className = "right reverse";
+						$R.className = "left";
+					}
+					else{
+						$L.className = "left";
+						$R.className = "right reverse";
+					}
+					$Lc.className = "caught LEFT";
+					$Rc.className = "caught RIGHT";
+				}
+				else{
+					if($L.classList.contains("reverse")){
+						$L.className = "left reverse";
+						$R.className = "right";
+					}
+					else{
+						$L.className = "right";
+						$R.className = "left reverse";
+					}
+					$Rc.className = "caught LEFT";
+					$Lc.className = "caught RIGHT";
+				}
+				this.ReverseMode = !this.ReverseMode;
+			},
+			ReverseBoard: function(){
+				let $L = document.getElementById("boardR");
+				let $R = document.getElementById("board");
+				
+				this.CopyBoard();
+
+				if(this.ReverseMode){
+					if($L.classList.contains("reverse")){
+						$L.className = "right";
+						$R.className = "left";
+						$R.classList.add("reverse");
+					}
+					else{
+						$L.className = "left";
+						$L.classList.add("reverse");
+						$R.className = "right";
+					}
+				}
+				else{
+					if($L.classList.contains("reverse")){
+						$L.className = "left";
+						$R.className = "right";
+						$R.classList.add("reverse");
+					}
+					else{
+						$L.className = "right";
+						$L.classList.add("reverse");
+						$R.className = "left";
+					}
+				}
+				
+				
+				for(let i=1; i<=8; i++){ //col
+					for(let j=1; j<=8; ++j){ //row
+						document.getElementById(i+""+j).classList.toggle("reverse");
+						document.getElementById(i+""+j+"R").classList = document.getElementById(i+""+j).classList;
+						document.getElementById(i+""+j+"R").classList.toggle("reverse");
+						
+					}
+				}
+
+				GAME.KEYBOARDMODE.Reverse();
+			},
+			CopyBoard: function(){
+				let $R = document.getElementById("boardR");
+				let $TABLE = $R.children[0];
+				for(let i=8; i>0; --i){ //col
+					for(let j=8; j>0; --j){ //row
+						let $td = $TABLE.children[i].children[j];
+						$td.innerHTML = document.getElementById($td.id[0]+$td.id[1]).innerHTML;
+					}
+				}				
+			},
+			TIMER:{
+				WHITE: new TIMER(document.getElementById("leftTimeWhite")),
+				BLACK: new TIMER(document.getElementById("leftTimeBlack"))
+			},
+			TIMELEFT: 300,
+			Start: function(){
+				for(let i=1; i<3; i++){
+					document.getElementById("B"+i).style.display="none";	
+					document.getElementById("p"+i).innerText = document.getElementById("player"+i).lastElementChild.value;
+				}
+				for(let i=1; i<=4; i++){
+					let elem = document.getElementById("t"+i);
+					if(elem.checked){ this.TIMELEFT = parseInt(elem.value); break; }
+				}
+				document.getElementById("B3").style.display="block";
+				
+				
+				this.LoadOverall(document.getElementById("p1").innerText, "WHITE", document.getElementById("p1Record"));
+				this.LoadOverall(document.getElementById("p2").innerText, "BLACK", document.getElementById("p2Record"));
+				
+				this.TIMER["WHITE"].setTime(this.TIMELEFT);
+				this.TIMER["BLACK"].setTime(this.TIMELEFT);
+				this.TIMER["WHITE"].on(GAME.IsTimeOver);
+				
+				this.SCORE.Init();
+
+				document.getElementById("timerWHITE").classList.add("turn");
+				document.getElementById("timerBLACK").classList.remove("turn");		
+				this.ClearLog();
+				
+				document.getElementById("board").innerHTML = "";
+				GAME.RenderBoard(document.getElementById("board"));
+				document.getElementById("board").className="left";
+				GAME.Initialize();				
+				document.getElementById("boardR").innerHTML = "";
+				GAME.RenderReverseBoard(document.getElementById("boardR"));	
+				document.getElementById("boardR").className="right reverse";
+			
+				GAME.KingCheck();
+				
+				document.getElementById("caught_BLACK").innerHTML="";
+				document.getElementById("caught_WHITE").innerHTML="";
+				
+				localStorage.setItem("chess.recentWhite", document.getElementById("p1").innerText);
+				localStorage.setItem("chess.recentBlack", document.getElementById("p2").innerText);
+			},
+			KEYBOARDMODE:{
+				COLUMN: 8,
+				ROW: 1,
+				STATEMENT: "OFF",
+				REVERSEMODE: false,
+				$LINK: null,
+				On: function(){
+					this.STATEMENT = "ON";
+					if(document.getElementById(this.COLUMN+""+this.ROW)){
+						if(this.REVERSEMODE) this.$LINK = document.getElementById(this.COLUMN+""+this.ROW+"R");
+						else this.$LINK = document.getElementById(this.COLUMN+""+this.ROW);
+					}
+					this.$LINK.classList.add("focus");
+				},
+				Off: function(){
+					this.STATEMENT = "OFF";
+					this.$LINK.classList.remove("focus");
+					this.$LINK = null;
+				},
+				MoveFocus: function(direction){
+					if(this.STATEMENT == "OFF") return;
+					
+					switch(direction){
+						case "UP": if(this.COLUMN-1 > 0) this.COLUMN--;	break;
+						case "DOWN": if(this.COLUMN+1 <= 8) this.COLUMN++; break;
+						case "LEFT": if(this.ROW-1 > 0) this.ROW--; break;
+						case "RIGHT": if(this.ROW+1 <=8) this.ROW++; break;
+					}
+					if(this.$LINK != null) this.$LINK.classList.remove("focus");
+
+
+					if(this.REVERSEMODE){
+						this.$LINK = document.getElementById(this.COLUMN+""+this.ROW+"R");
+					}
+					else{
+						this.$LINK = document.getElementById(this.COLUMN+""+this.ROW);					
+					}
+					this.$LINK.classList.add("focus");
+				},
+				Click: function(){
+					if(this.$LINK == null || this.REVERSEMODE) return;
+					
+					if(this.$LINK.childElementCount == 0) this.$LINK.click();
+					else this.$LINK.firstElementChild.click();
+				},
+				Reverse: function(){
+					if(GAME.TURN == "WHITE"){
+						if(this.$LINK != null){
+							this.$LINK.classList.remove("focus");
+							this.$LINK = document.getElementById(this.COLUMN+""+this.ROW+"R")
+							this.$LINK.classList.add("focus");
+						}
+						this.REVERSEMODE = false;
+					}
+					else{
+						if(this.$LINK != null){
+							this.$LINK.classList.remove("focus");
+							this.$LINK = document.getElementById(this.COLUMN+""+this.ROW)
+							this.$LINK.classList.add("focus");
+						}
+						this.REVERSEMODE = true;
+					}
+
+				}
+			},
+			ToggleKeyboardMode: function(){
+				
+			},
+			RequestUndo: function(){
+				GAME.ToggleBlinder("on");
+				let $MENU = document.getElementById("menu");
+				if($MENU){ $MENU.remove(); 	GAME.ToggleBlinder("off"); return; }
+				
+				let $BOX = document.createElement("div");
+				$BOX.className = "checkMateBoard";
+				$BOX.id="menu";
+				let $MSG = document.createElement("h1");
+				$MSG.innerHTML = "무르기 요청";
+				
+				let $INPUT = document.createElement("input");
+				$INPUT.oninput = function(e){
+					if(this.value == "다시는 까불지 않겠습니다") $Btn1.disabled = false;
+					else $Btn1.disabled = true;
+				}
+				$INPUT.onkeydown = function(e){	if(e.keyCode == 13 && !$Btn1.disabled){ $Btn1.click(); }}
+				
+				let $P = document.createElement("p");
+				$P.innerHTML = "무르기를 승락하시려면 '다시는 까불지 않겠습니다'를 입력하세요!"
+				
+				let $Btn1 = document.createElement("button");
+				$Btn1.innerHTML = "확인";
+				$Btn1.onclick = ()=>{ this.Undo(); $BOX.remove(); this.ToggleBlinder("off"); }
+				$Btn1.disabled = true;
+				
+				let $Btn2 = document.createElement("button");
+				$Btn2.innerHTML = "거절";
+				$Btn2.onclick = ()=>{$BOX.remove(); this.ToggleBlinder("off"); }
+
+				$BOX.append($MSG);
+				$BOX.append($INPUT);
+				$BOX.append($P);
+				$BOX.append($Btn1);
+				$BOX.append($Btn2);
+				
+				document.body.append($BOX);
+			},
+			
+			IsTimeOver: function(){ //TIMERcallbackFn
+				if((GAME.TIMER["WHITE"].getTime()<0 && GAME.TURN=="WHITE") || (GAME.TIMER["BLACK"].getTime()<0&& GAME.TURN=="BLACK")){
+					GAME.Over("시간초과");
+				}
+			}
+		}
+
+		class chessMan{
+			constructor(type="QUEEN", color="WHITE", column=-1, row=-1, diff=1, link=null){
+				this.setTypeName(type);
+				this.setColor(color);
+				this.setPos(column, row);
+				this.moveList = GAME.MOVELIST[this.type];	//행마법리스트
+				this.nextMoveList = [];						//현재 이동 가능한 칸 리스트
+				this.isMoved = false;
+				this.isSelected = false;
+				this.setLink(link);
+
+				if(this.$link == null){
+					chessMan.setChessManSpan(type,color,column,row,diff);
+					this.setLink(POSITION.getSpan(column,row));
+				}
+				
+				if(this.type == "KING"){ //킹의 캐슬링 추가
+					this.canQueenSideCastle = false;
+					this.canKingSideCastle = false;
+					this.castling = function(side){
+						if(side == "QUEEN"){
+							GAME.MAP[this.column-1][0].move(this.column,4);
+							this.move(this.column,3);
+							GAME.ToggleTurn();
+							GAME.KingCheck(true);
+							GAME.SetAllNextMoveList();
+							GAME.AddLog("CASTLING_QUEEN");						
+							GAME.ReverseBoard();
+
+
+						}
+						else if(side == "KING"){
+							GAME.MAP[this.column-1][7].move(this.column,6);
+							this.move(this.column,7);
+							GAME.ToggleTurn();						
+							GAME.KingCheck(true);	
+							GAME.SetAllNextMoveList();							
+							GAME.AddLog("CASTLING_KING");	
+							GAME.ReverseBoard();
+
+						}
+					}
+					this.castlingWithAnimation = function(side){
+						let $KING = this.$link;
+						let $target1, $ROOK, $target2;
+						
+						if(side == "QUEEN"){
+							$target1 = document.getElementById(POSITION.getId([this.column, 3]));
+							$ROOK = document.getElementById(POSITION.getId([this.column, 1])).firstElementChild;
+							$target2 = document.getElementById(POSITION.getId([this.column, 4]));
+						}
+						else if(side =="KING"){
+							$target1 = document.getElementById(POSITION.getId([this.column, 7]));
+							$ROOK = document.getElementById(POSITION.getId([this.column, 8])).firstElementChild;
+							$target2 = document.getElementById(POSITION.getId([this.column, 6]));
+						
+						}
+						let moveX1, moveX2;
+						moveX1 = $target1.offsetLeft - $KING.parentElement.offsetLeft;
+						moveX2 = $target2.offsetLeft - $ROOK.parentElement.offsetLeft;
+						POSITION.clearMoveToClassOnMap();
+						if(GAME.TURN == "BLACK"){ moveX1 = -moveX1;  moveX2 = -moveX2; }
+						$KING.style.transform = "translateX(" + moveX1 + "px)";
+						$ROOK.style.transform = "translateX(" + moveX2 + "px)";
+						
+						let $reverseKING = document.getElementById($KING.parentElement.id + "R").firstElementChild;
+						let $reverseROOK = document.getElementById($ROOK.parentElement.id + "R").firstElementChild;
+						$reverseKING.style.transform = "translateX(" + (-moveX1) + "px)";
+						$reverseROOK.style.transform = "translateX(" + (-moveX2) + "px)";
+
+						setTimeout(()=>{$KING.style.transform =""; $ROOK.style.transform=""; $reverseKING.style.transform="";  $reverseROOK.style.transform=""; this.castling(side);}, 300);						
+					}
+				}
+				if(this.type.indexOf("PAWN")>-1){
+					this.promotion = function(type){
+						switch(type){
+							case "QUEEN": case "KNIGHT": case "ROOK": case "BISHOP":
+								this.$link.remove();
+								GAME.MAP[(this.column-1)][(this.row-1)] = new chessMan(type, this.color, this.column, this.row, 6, POSITION.getSpan(this.column,this.row));
+								GAME.KingCheck(true);
+								GAME.SetAllNextMoveList();								
+						}
+					}
+					//폰 행마법 : 앙파상
+					this.getEnPassingElement = function(col, row){
+						if(!POSITION.isValid(col+1, row+1)) return "EMPTY";
+						
+						if(this.type=="PAWN_WHITE"){
+							if(POSITION.isValid(this.column, row) && GAME.MAP[this.column-1][row].type == "PAWN_BLACK" && GAME.MAP[this.column-1][row].enPassing==true)
+								return "EN_PASSING";
+						}
+						else if(this.type=="PAWN_BLACK"){
+							if(POSITION.isValid(this.column, row) && GAME.MAP[this.column-1][row].type == "PAWN_WHITE" && GAME.MAP[this.column-1][row].enPassing==true)
+								return "EN_PASSING";
+						}
+						return "EMPTY";
+					}
+				}
+			}
+
+			move(column, row){
+				if(typeof(column)=="string") column = parseInt(column);
+				if(typeof(row)=="string") row = parseInt(row);
+				if(POSITION.isValid(column, row)){
+					POSITION.clearLastMovedClassOnMap();
+					let $Target = document.getElementById(POSITION.getId([column, row]));
+					
+					if(GAME.MAP[column-1][row-1] != 0) GAME.AddLog(this, [this.column, this.row], [column,row], this.isMoved, GAME.MAP[column-1][row-1]);
+					else GAME.AddLog(this, [this.column, this.row], [column,row], this.isMoved, null);	
+					
+					if(this.type.indexOf("PAWN")>=0){
+						if(!this.isMoved && Math.abs(column-this.column)==2){ //앙파상 조건 : 폰이 한번도 안움직였고 두칸 움직인것
+							this.enPassing = true;
+						}
+						if(this.column != column && this.row != row && GAME.MAP[column-1][row-1]==0){ //대각선움직였는데 빈칸이다 => 앙파상
+							GAME.LOG.pop(); document.getElementById("log").removeChild(document.getElementById("log").lastElementChild);
+							GAME.AddLog(this, [this.column, this.row], [column,row], this.isMoved, GAME.MAP[this.column-1][row-1]);
+							GAME.SCORE.AddElement(GAME.TURN, document.getElementById(POSITION.getId([this.column, row])));
+							GAME.MAP[this.column-1][row-1] = 0; //잡을 말
+						}
+						else{ if($Target.children[0]!=null) GAME.SCORE.AddElement(GAME.TURN, $Target); }
+					}
+					else{ if($Target.children[0]!=null) GAME.SCORE.AddElement(GAME.TURN, $Target); }
+
+					
+					GAME.MAP[column-1][row-1] = GAME.MAP[this.column-1][this.row-1];
+					GAME.MAP[this.column-1][this.row-1] = 0;
+					document.getElementById(POSITION.getId([this.column, this.row])).classList.add("lastMoveStart");
+					this.column = column; this.row = row; this.isMoved = true;						//obj
+					$Target.innerHTML = "";
+					$Target.appendChild(this.$link); //DOM Elem
+					$Target.classList.add("lastMoveEnd");
+					
+					if(this.type=="KING") GAME.SetKingPos(this.color, column, row);
+					
+					this.allEnPassingOff();
+				}
+				else throw("PositionError: Invalid Position to move");
+				
+				GAME.SELECTED = null;
+				this.isSelected = false;
+				
+				GAME.ToggleTurn();
+				
+				GAME.KingCheck(true);	
+	
+				POSITION.clearMoveToClassOnMap();
+				GAME.SetAllNextMoveList();
+				GAME.ReverseBoard();
+			}
+			
+			moveWithAnimation(column, row){
+				if(typeof(column)=="string") column = parseInt(column);
+				if(typeof(row)=="string") row = parseInt(row);
+				if(!POSITION.isValid(column, row)){ throw("PositionError: Invalid Position to move"); }
+				
+				let moveX, moveY, objBox, targetBox, reverseObj;
+				objBox = document.getElementById(POSITION.getId([this.column, this.row]));
+				targetBox = document.getElementById(POSITION.getId([column,row]));
+				reverseObj = document.getElementById(objBox.id + "R").firstElementChild;
+				
+				moveX = targetBox.offsetLeft - objBox.offsetLeft;
+				moveY = targetBox.offsetTop - objBox.offsetTop;
+				
+				POSITION.clearMoveToClassOnMap();
+				if(GAME.TURN == "BLACK"){ moveX = -moveX; moveY = -moveY; }
+				this.$link.style.transform = "translate(" + moveX + "px," + moveY + "px)";
+				reverseObj.style.transform = "translate(" + (-moveX) + "px," + (-moveY) + "px)";
+				
+				setTimeout(()=>{this.$link.style.transform =""; reverseObj.style.transform=""; this.move(column, row);}, 300);
+			}
+			
+			toggleSelected(){
+				POSITION.clearMoveToClassOnMap();
+				if(GAME.SELECTED === this){ //같은거 선택
+					GAME.SELECTED = null; this.isSelected = false;
+				}
+				else{ //다른거 클릭
+					if(GAME.SELECTED != null) GAME.SELECTED.isSelected = false;
+					GAME.SELECTED = this; this.isSelected = true;
+					for(let i=0; i<this.nextMoveList.length; ++i)
+						document.getElementById(POSITION.getId(this.nextMoveList[i])).classList.add("moveTo");
+				}
+			}
+			
+			setNextMoveList(){
+				GAME.KingCheck(false);
+				let moveToPos = this.getPossibleMove();
+				this.nextMoveList = [];
+				for(let i=0; i<moveToPos.length; ++i){
+					if(this.type=="KING")
+						this.nextMoveList.push(moveToPos[i]);
+					else if(!this.getCheckElement(moveToPos[i]))
+						this.nextMoveList.push(moveToPos[i]);
+				}
+			}
+			
+			//setter
+			setPos = (col, row) => { if(!POSITION.isValid(col,row)) throw("Invalid Position Error"); else this.column = col; this.row = row; }
+			setTypeName = (type) => {this.type = chessMan.getTypeName(type);}
+			setColor = (color) => {this.color = chessMan.getColor(color);}
+			setLink($DOM){
+				this.$link = $DOM;
+				if($DOM != null) this.$link.addEventListener("click", ()=>{if(GAME.TURN==this.color)chessMan.select(this)});
+			}
+			
+			
+			//getter
+			
+			getTypeName = () => this.type;
+			getTypeNumber = () => chessMan.getTypeNumber(this.type);
+			getColor = () => this.color;
+			getPos = () => [this.column, this.row];
+			getLink = () => this.$link;
+			getScore = ()=>{
+				switch(this.type){
+					case "QUEEN": return 8;
+					case "ROOK": return 5;
+					case "KING": return 4;
+					case "KNIGHT": case "BISHOP": return 3;
+					case "PAWN_BLACK": case "PAWN_WHITE":  return 1;
+				}
+			}
+			getPossibleMove(mode){
+				let result=[], val, mul, len, collision;
+				len = this.moveList.length;
+				switch(this.type){
+					case "KING":
+						mul = 1;
+						for(let i=0; i<len; ++i){
+							val=[(this.column + this.moveList[i][0]),(this.row + this.moveList[i][1])];
+							if(POSITION.isValid(val[0], val[1])){
+								if(mode == "CHECK") result.push(val);
+								else if(GAME.KingPossibleMove[(val[0]-1)][(val[1]-1)] && this.getCollisionElement(GAME.MAP[(val[0]-1)][(val[1]-1)]) != "EQUAL")
+									result.push(val);	//킹 행마법 : 잡히는 칸으로 이동 불가
+							}
+						}
+						//캐슬링
+						if(this.isMoved){
+							this.canQueenSideCastle = false;
+							this.canKingSideCastle = false;
+						}
+						else{
+							let col;
+							if(this.color=="WHITE") col=7; else col=0;
+							let moveElem=GAME.MAP[col];
+							let attackElem=GAME.KingPossibleMove[col];
+							if(moveElem[0]&&!moveElem[0].isMoved&&!moveElem[1]&&!moveElem[2]&&!moveElem[3]&&attackElem[1]&&attackElem[2]&&attackElem[3]&&attackElem[4]){ //퀸사이드
+								this.canQueenSideCastle = true;
+								result.push([col+1,3]);
+							}
+							if(moveElem[7]&&!moveElem[7].isMoved&&!moveElem[5]&&!moveElem[6]&&attackElem[4]&&attackElem[5]&&attackElem[6]){ 
+								this.canKingSideCastle = true;
+								result.push([col+1,7]);		
+							}
+						}
+						return result;
+					case "KNIGHT": mul = 1; ; break;
+					case "QUEEN": case "ROOK": case "BISHOP": mul = 8; break;
+					case "PAWN_BLACK": case "PAWN_WHITE": 
+						len = 1; if(!this.isMoved) mul=2; else mul=1;
+						for(let i=1; i<=2; ++i){ //폰 특수행마법
+							val=[this.column + this.moveList[i][0], this.row + this.moveList[i][1]];
+							if(POSITION.isValid(val[0], val[1]) && (this.getCollisionElement(GAME.MAP[(val[0]-1)][(val[1]-1)]) == "PAWN" || this.getEnPassingElement(val[0]-1, val[1]-1)=="EN_PASSING")) result.push(val);
+						}
+				}
+				for(let i=0; i<len; ++i){
+					for(let m=1; m<=mul; ++m){
+						val=[]; val.push(this.column + this.moveList[i][0]*m); val.push(this.row + this.moveList[i][1]*m);
+						
+						if(POSITION.isValid(val[0], val[1])){
+							collision = this.getCollisionElement(GAME.MAP[(val[0]-1)][(val[1]-1)]);
+							if(collision == "EQUAL" || collision == "PAWN"){
+								if(mode == "CHECK") result.push(val); //잡는게 체크상태인것을 막음
+								break;
+							}
+							else if(collision == "NOT EQUAL"){ result.push(val); if(GAME.MAP[(val[0]-1)][(val[1]-1)].type!="KING") break;} //킹은 계산할때 길을 막지 않음 }
+							result.push(val);
+						}
+					}
+				}
+				return result;
+			}
+			
+			
+			//내턴이 종료되면 모든 앙파상 불가능하도록 하는 함수
+			allEnPassingOff(){
+				for(let i=0; i<8; ++i){
+					for(let j=0; j<8; ++j){
+						let elem = GAME.MAP[i][j];
+						if(typeof(elem)=="object" && elem.type.indexOf("PAWN")>=0 && elem.color != this.color) //상대방 폰에대한 앙파상 false
+							elem.enPassing = false;
+					}
+				}
+			}
+			getCollisionElement(obj){
+				try{
+					if(obj == 0) return "EMPTY"; //빈칸
+					else if(obj == -1) return "NOT EQUAL"; //임시객체
+					else if(this.type == "PAWN_WHITE" || this.type=="PAWN_BLACK"){
+						if(obj.type=="EN_PASSING" || (this.row != obj.row && this.color != obj.color)) return "PAWN";
+						return "EQUAL";
+					} //폰 행마법
+					else if(this.color == obj.color) return "EQUAL"; //같은팀말
+					else return "NOT EQUAL"; //다른팀말
+				}catch(p){ throw("ReferenceError: Argument is not an object"); }
+			}
+
+			//움직인게 체크상태를 만들면 그 움직임을 제한
+			getCheckElement(RawPos){
+				let col = RawPos[0], row = RawPos[1], rawChessMan, origChessMan;
+				let kingPos = GAME.GetKingPos(this.color);
+				
+				rawChessMan = GAME.MAP[col-1][row-1];
+				if(this.type != "KING"){
+					origChessMan = GAME.MAP[this.column-1][this.row-1];
+					GAME.MAP[this.column-1][this.row-1] = 0;
+				}
+					
+				GAME.MAP[col-1][row-1] = -1;
+				GAME.KingCheck(false);
+				GAME.MAP[col-1][row-1] = rawChessMan;
+				
+				if(this.type!= "KING")
+					GAME.MAP[this.column-1][this.row-1] = origChessMan;
+				
+				if(GAME.KingPossibleMove[kingPos[0]-1][kingPos[1]-1]) return false;
+				return true;
+			}
+			
+			//static
+			static getTypeName(type){
+				let val;
+				if(typeof(type) == "string") val = type.toUpperCase();
+				
+				if(GAME.TYPE.includes(val)) return val;
+				switch(val){
+					case "킹": case "왕": case 0: return "KING"; break;
+					case "룩": case 1: return "ROOK"; break;
+					case "나이트": case "말": case 2: return "KNIGHT"; break;
+					case "비숍": case 3: return "BISHOP"; break;
+					case "퀸": case "여왕": case 4: return "QUEEN"; break;
+					case "블랙폰": case "흑졸": case 5: return "PAWN_BLACK"; break;
+					case "화이트폰": case "백졸": case 6: return "PAWN_WHITE"; break;
+				}
+				return "NONE";
+			}
+			static getTypeNumber(type){
+				let val;
+				if(typeof(type) == "string") val = type.toUpperCase();	
+			}
+			static getColor(color){
+				let val;
+				if(typeof(color) == "string") val = color.toUpperCase();
+				switch(val){
+					case "백": case "WHITE": case "W": case "WT": case 0: case "0": return "WHITE"; break;
+					case "흑": case "BLACK": case "B": case "BL": case 1: case "1": return "BLACK";
+				}
+				return "NONE";
+			}
+			static getPossibleMove(target){
+				try{ return target.getPossibleMove(); }
+				catch(p){throw("ReferenceError: Invalid Target"); }
+			}
+			static select(target){
+				try{ target.toggleSelected(); }
+				catch(p){throw(p); }
+			}
+			static getScore(target){
+				return target.getScore();
+			}
+			static getChessManUnicode(type="QUEEN"){
+				try{ return GAME.CHESSMANSPAN[type]; }
+				catch(p){throw(p);}
+			}
+			static createChessManSpan(type="QUEEN", color="WHITE", id){
+				try{ let code = chessMan.getChessManUnicode(type);
+					 let newSpan = document.createElement("p");
+					 newSpan.classList.add(color);
+					 newSpan.innerHTML = code;
+					 newSpan.id = color+"_"+type+id;
+					 return newSpan; }
+				catch(p){throw(p);}
+			}
+			static setChessManSpan(type, color, column, row, diff){
+				if(POSITION.isValid(column, row)){
+					document.getElementById(POSITION.getId([column, row])).append(chessMan.createChessManSpan(type,color, diff));
+				}
+			}
+		}
+
+	
+
+		
+		const POSITION = {
+			isValid: function(col, row){
+				if(!(1 <= col && col <= 8)) return false;
+				let val;
+				switch(row){
+					case 'A': case 'a': val = 1; break;
+					case 'B': case 'b': val = 2; break;
+					case 'C': case 'c': val = 3; break;
+					case 'D': case 'd': val = 4; break;
+					case 'E': case 'e': val = 5; break;
+					case 'F': case 'f': val = 6; break;
+					case 'G': case 'g': val = 7; break;
+					case 'H': case 'h': val = 8; break;
+					default: val = row;
+				}
+				if(!(1 <= val && val <= 8)) return false;
+				return true;
+			},
+			/* id를 입력하면 좌표값 2개를 반환하는 함수 */
+			getPos: function(id){
+				var result = [];
+				result.push(Math.floor(id/10)-1);
+				result.push(id%10-1);
+				if(this.isValid(result[0], result[1]))
+					return result;
+				else
+					throw("잘못된 좌표 입력, VALUE : " + result);
+			},
+			getId: function(posArr){
+				if(this.isValid(posArr[0], posArr[1]))
+					return (posArr[0]) + "" + (posArr[1]);
+				else
+					throw("잘못된 좌표 입력, VALUE : " + posArr);
+			},
+			getSpan: function(column, row){
+				try{
+					if(POSITION.isValid(column, row))
+					return document.getElementById(column+""+row).children[0];
+				}
+				catch(p){ throw("ReferenceError: Invalid Position"); }
+			},
+			getElem: function(column, row){ //DOM 요소 반환
+				return document.getElementById(this.getId([column, row]));
+			},
+			/* id 와 val 이용하여 말 찾는 함수 */			
+			getMalValById: function(id){
+				for(var i = 1; i <= 8; ++i)
+					for(var j = 1; j <= 8; ++j)
+						if(Map[i][j].linkedDom.id == id)
+							return Map[i][j];
+			},
+			getMalIdByVal: function(val){
+				for(var i = 1; i <= 8; ++i)
+					for(var j = 1; j <= 8; ++j)
+						if(Map[i][j] == val)
+							return Map[i][j].linkedDom.id;			
+			},
+			/* 맵에서 moveTo Class 초기화 시키는 함수 */		
+			clearMoveToClassOnMap: function(){
+				for(var i = 1; i <= 8; ++i)
+					for(var j = 1; j <= 8; ++j)
+						document.getElementById(i+""+j).classList.remove("moveTo");
+				CURSELECT = undefined;
+			},
+			clearLastMovedClassOnMap: function(){
+				for(var i = 1; i <= 8; ++i)
+					for(var j = 1; j <= 8; ++j){
+						document.getElementById(i+""+j).classList.remove("lastMoveStart");
+						document.getElementById(i+""+j).classList.remove("lastMoveEnd");
+					}
+			}
+		}
+
+		
+		KeyDownHandler = function(e){
+			if(document.getElementById("B3").style.display != "none"){
+				if(e.keyCode==80){ //p
+					GAME.Pause();
+				}
+				else if(e.keyCode==27 && !document.getElementById("checkMateBoard")){ //esc
+					GAME.OpenMenu();
+				}
+				else if(e.keyCode==38){ //up
+					GAME.KEYBOARDMODE.MoveFocus("UP");
+				}
+				else if(e.keyCode==40){ //down
+					GAME.KEYBOARDMODE.MoveFocus("DOWN");
+				}
+				else if(e.keyCode==37){ //left
+					GAME.KEYBOARDMODE.MoveFocus("LEFT");
+				}
+				else if(e.keyCode==39){ //right
+					GAME.KEYBOARDMODE.MoveFocus("RIGHT");
+				}
+				else if(e.keyCode==32){ //spaceBar
+					GAME.KEYBOARDMODE.Click();
+				}
+				else if(e.keyCode==82){ //R
+					GAME.ToggleReverseMode();
+				}
+			}
+			
+			console.log(e.keyCode);
+		}
+		document.onkeydown = KeyDownHandler;
+		window.onload = function(){
+			let darkmode = localStorage.getItem("chess.darkmode");
+			if(darkmode){
+				document.getElementById("darkmodeBtn").checked = true;
+				document.body.style.background = "black";
+				document.getElementById("B3").classList.add("darkmode");
+			}
+			
+			let w, b;
+			w = localStorage.getItem("chess.recentWhite");
+			if(w==null) w="Player1";
+			b = localStorage.getItem("chess.recentBlack");
+			if(b==null) b="Player2";
+			document.getElementById("nameWHITE").value = w
+			document.getElementById("overallWHITE").innerHTML = "전적 : " + GAME.GetOverallStr(GAME.LoadOverall(w, "WHITE"), "overall")
+			document.getElementById("nameBLACK").value = b
+			document.getElementById("overallBLACK").innerHTML = "전적 : " + GAME.GetOverallStr(GAME.LoadOverall(b, "BLACK"), "overall")			
+		}
+		
+		</script>
+	</body>
+</html>
+		

@@ -1,0 +1,306 @@
+<!Doctype html>
+<html>
+	<head>
+		<meta charset = "UTF-8">
+		<script type="text/javascript" src="http://tv.dema.mnd.mil/2019/js/jquery-1.11.2.js"></script>
+		
+		
+		<style>
+			body{ user-select: none; }
+			table{ border: 4px solid black; border-spacing: 0; margin: 0 auto;}
+			td{ transition: 0.2s; width: 12px; text-align: center;  }
+			
+			tr.top td{	height:120px; }
+			tr.bottom td{	height:80px; }
+			
+			
+			.bottom td{ border-right: 2px solid black; }
+			.top td[class~="empty"]:nth-child(3n-1){ border-right: 2px solid black; }
+			.top td[class~="empty"]:nth-child(4n){ border-right: 2px solid black; }
+			
+			
+			.top td{ width: 12px;}
+			
+			td.black{ width: 30px; background:black; color: white; }
+			td.hover{ background:#B8B8B8; }
+			td.black:hover{ opacity: 0.85; }
+			
+			td.empty{ width: 24px; }
+			
+			
+			
+			td.pressed{ background: red; }
+			
+			.invalid{ background: red; color: white; }
+
+		</style>
+	</head>
+	<body>
+
+		<div class="wrapper">
+			
+		</div>
+		
+	
+		<script type = "text/javascript">
+			const audioContext = new AudioContext();
+			
+			const buffer = audioContext.createBuffer(
+				1,
+				audioContext.sampleRate * 1,
+				audioContext.sampleRate
+			);
+			
+			const channelData = buffer.getChannelData(0);
+			for(let i=0; i<buffer.length; ++i)
+				channelData[i] = Math.random() * 2 - 1;
+			
+
+							
+			const primaryGainControl = audioContext.createGain();
+			primaryGainControl.gain.setValueAtTime(0.05, 0);
+			
+
+			primaryGainControl.connect(audioContext.destination);
+			
+			
+
+			
+			let $btn = document.createElement("button");
+			$btn.innerText = "snare";
+			$btn.onclick = ()=>{ snare(); };
+			document.body.appendChild($btn);
+			
+			$btn = document.createElement("button");
+			$btn.innerText = "kick";
+			$btn.onclick = ()=>{ kick(); };
+			document.body.appendChild($btn);
+			
+			$btn = document.createElement("button");
+			$btn.innerText = "highhat";
+			$btn.onclick = ()=>{ highhat(); };
+			document.body.appendChild($btn);
+			
+			
+			document.onkeydown = function(e){
+				if(e.keyCode == 65) highhat(); //a
+				else if(e.keyCode == 83) snare(); //s
+				else if(e.keyCode == 32) kick(); //spacebar
+				else if(e.keyCode == 68) lowtom(); //spacebar
+				else if(e.keyCode == 81) simbal(); //spacebar
+			}
+			
+			function simbal(){
+				const snareFilter = audioContext.createBiquadFilter();
+				snareFilter.type = "lowpass";
+				snareFilter.frequency.value = 800.0;
+				snareFilter.connect(primaryGainControl);
+			
+				const whiteNoiseSource = audioContext.createBufferSource();
+				whiteNoiseSource.buffer = buffer;
+				
+				const whiteNoiseGain = audioContext.createGain();
+				whiteNoiseGain.gain.setValueAtTime(1000, audioContext.currentTime);
+				whiteNoiseGain.gain.exponentialRampToValueAtTime(1.5, audioContext.currentTime+0.025);
+
+
+//vibrato
+				const vibrato = audioContext.createOscillator();
+				vibrato.frequency.setValueAtTime(12, 0);
+				const vibratoGain = audioContext.createGain();
+				vibratoGain.gain.setValueAtTime(1.5, 0);
+				vibrato.connect(vibratoGain);
+				vibratoGain.connect(whiteNoiseGain);
+				vibrato.start();
+//
+
+
+				whiteNoiseSource.connect(whiteNoiseGain);
+				whiteNoiseGain.connect(snareFilter);
+				whiteNoiseSource.start();
+				whiteNoiseSource.stop(audioContext.currentTime+0.1);
+
+
+
+
+				const snareOscillator = audioContext.createOscillator();
+				snareOscillator.type = "triangle";
+				snareOscillator.frequency.setValueAtTime(80, audioContext.currentTime);
+				
+				const oscillatorGain = audioContext.createGain();
+				oscillatorGain.gain.setValueAtTime(200, audioContext.currentTime);
+				oscillatorGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+				snareOscillator.connect(oscillatorGain);
+				oscillatorGain.connect(primaryGainControl);
+				snareOscillator.start();
+				snareOscillator.stop(audioContext.currentTime + 0.2);				
+			}			
+			
+			function snare(){
+				const snareFilter = audioContext.createBiquadFilter();
+				snareFilter.type = "highpass";
+				snareFilter.frequency.value = 1500;
+				snareFilter.connect(primaryGainControl);
+			
+				const whiteNoiseSource = audioContext.createBufferSource();
+				whiteNoiseSource.buffer = buffer;
+				
+				const whiteNoiseGain = audioContext.createGain();
+				whiteNoiseGain.gain.setValueAtTime(9, audioContext.currentTime);
+				whiteNoiseGain.gain.exponentialRampToValueAtTime(0.4, audioContext.currentTime+0.25);
+				
+
+
+				whiteNoiseSource.connect(whiteNoiseGain);
+				whiteNoiseGain.connect(snareFilter);
+				
+				whiteNoiseSource.start();
+				whiteNoiseSource.stop(audioContext.currentTime+0.2);
+				
+				const snareOscillator = audioContext.createOscillator();
+				snareOscillator.type = "triangle";
+				snareOscillator.frequency.setValueAtTime(100, audioContext.currentTime);
+				
+				const oscillatorGain = audioContext.createGain();
+				oscillatorGain.gain.setValueAtTime(0.7, audioContext.currentTime);
+				oscillatorGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+				snareOscillator.connect(oscillatorGain);
+				oscillatorGain.connect(primaryGainControl);
+				snareOscillator.start();
+				snareOscillator.stop(audioContext.currentTime + 0.2);
+			}
+			
+			function lowtom(){
+				const snareFilter = audioContext.createBiquadFilter();
+				snareFilter.type = "lowpass";
+				snareFilter.frequency.value = 800.0;
+				snareFilter.connect(primaryGainControl);
+			
+				const whiteNoiseSource = audioContext.createBufferSource();
+				whiteNoiseSource.buffer = buffer;
+				
+				const whiteNoiseGain = audioContext.createGain();
+				whiteNoiseGain.gain.setValueAtTime(30, audioContext.currentTime);
+				whiteNoiseGain.gain.exponentialRampToValueAtTime(3, audioContext.currentTime+0.25);
+				
+
+
+				whiteNoiseSource.connect(whiteNoiseGain);
+				whiteNoiseGain.connect(snareFilter);
+				
+				whiteNoiseSource.start();
+				whiteNoiseSource.stop(audioContext.currentTime+0.2);
+				
+				const snareOscillator = audioContext.createOscillator();
+				snareOscillator.type = "triangle";
+				snareOscillator.frequency.setValueAtTime(100, audioContext.currentTime);
+				
+				const oscillatorGain = audioContext.createGain();
+				oscillatorGain.gain.setValueAtTime(0.7, audioContext.currentTime);
+				oscillatorGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+				snareOscillator.connect(oscillatorGain);
+				oscillatorGain.connect(primaryGainControl);
+				snareOscillator.start();
+				snareOscillator.stop(audioContext.currentTime + 0.2);
+			}			
+			
+			
+			function kick(){
+				const snareFilter = audioContext.createBiquadFilter();
+				snareFilter.type = "lowpass";
+				snareFilter.frequency.value = 196.0;
+				snareFilter.connect(primaryGainControl);
+			
+				const whiteNoiseSource = audioContext.createBufferSource();
+				whiteNoiseSource.buffer = buffer;
+				
+				const whiteNoiseGain = audioContext.createGain();
+				whiteNoiseGain.gain.setValueAtTime(300, audioContext.currentTime);
+				whiteNoiseGain.gain.exponentialRampToValueAtTime(7, audioContext.currentTime+0.25);
+				
+
+
+				whiteNoiseSource.connect(whiteNoiseGain);
+				whiteNoiseGain.connect(snareFilter);
+				
+				whiteNoiseSource.start();
+				whiteNoiseSource.stop(audioContext.currentTime+0.2);
+				
+				const snareOscillator = audioContext.createOscillator();
+				snareOscillator.type = "triangle";
+				snareOscillator.frequency.setValueAtTime(100, audioContext.currentTime);
+				
+				const oscillatorGain = audioContext.createGain();
+				oscillatorGain.gain.setValueAtTime(0.7, audioContext.currentTime);
+				oscillatorGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+				snareOscillator.connect(oscillatorGain);
+				oscillatorGain.connect(primaryGainControl);
+				snareOscillator.start();
+				snareOscillator.stop(audioContext.currentTime + 0.2);
+			}
+			
+			function highhat(){
+				const snareFilter = audioContext.createBiquadFilter();
+				snareFilter.type = "highpass";
+				snareFilter.frequency.value = 8000;
+				snareFilter.connect(primaryGainControl);
+			
+				const whiteNoiseSource = audioContext.createBufferSource();
+				whiteNoiseSource.buffer = buffer;
+				
+				const whiteNoiseGain = audioContext.createGain();
+				whiteNoiseGain.gain.setValueAtTime(5, audioContext.currentTime);
+				whiteNoiseGain.gain.exponentialRampToValueAtTime(0.3, audioContext.currentTime+0.25);
+				
+
+
+				whiteNoiseSource.connect(whiteNoiseGain);
+				whiteNoiseGain.connect(snareFilter);
+				
+				whiteNoiseSource.start();
+				whiteNoiseSource.stop(audioContext.currentTime+0.2);
+				
+				const snareOscillator = audioContext.createOscillator();
+				snareOscillator.type = "triangle";
+				snareOscillator.frequency.setValueAtTime(100, audioContext.currentTime);
+				
+				const oscillatorGain = audioContext.createGain();
+				oscillatorGain.gain.setValueAtTime(0.7, audioContext.currentTime);
+				oscillatorGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+				snareOscillator.connect(oscillatorGain);
+				oscillatorGain.connect(primaryGainControl);
+				snareOscillator.start();
+				snareOscillator.stop(audioContext.currentTime + 0.2);
+			}
+
+			/*
+			//건반 1옥타브
+			<table>
+				<tr class="top">
+					<td class="empty" colspan=2></td>
+					<td class="black" colspan=2></td>
+					<td></td>
+					<td class="black" colspan=2></td>
+					<td class="empty" colspan=2></td>
+					<td class="empty" colspan=2></td>
+					<td class="black" colspan=2></td>
+					<td></td>
+					<td class="black" colspan=2></td>
+					<td></td>
+					<td class="black" colspan=2></td>
+					<td class="empty" colspan=2></td>
+				</tr>
+				<tr class="bottom">
+					<td colspan=3></td>
+					<td colspan=3></td>
+					<td colspan=3></td>
+					<td colspan=3></td>
+					<td colspan=3></td>
+					<td colspan=3></td>
+					<td colspan=3></td>
+				</tr>				
+			</table>
+			*/
+		</script>
+	</body>
+</html>

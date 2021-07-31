@@ -1,0 +1,148 @@
+<!Doctype html>
+<html>
+	<head>
+		<meta charset = "UTF-8">
+		
+	</head>
+	<body>
+		<canvas id = "myCanvas" width="400" height="600" style="margin: 0 auto; border: black 1px solid"></canvas>
+		
+		<script type = "text/javascript">
+			var canvas = document.getElementById("myCanvas");
+			var ctx = canvas.getContext("2d");
+			var ballRadius = 40;
+			var dx = 0;
+			var defaultDy = 10;
+			var dy = -20;
+			var gravity = 15;
+			var blockSize = 30;
+			var blockPadding = 2;
+			var rightPressed = false;
+			var leftPressed = false;
+			var mouseClicked = false;
+			var mouseClickPosX = -10000;
+			var mouseClickPosY = -10000;
+			var mouseClickRadius = 30;
+			var ballPower = 0;
+			var scores = 0;
+			
+			var x = canvas.width / 2;
+			var y = canvas.height;
+			
+			//땅
+
+			function CollisionDetection(){
+				var distX = x - mouseClickPosX;
+				var distY = y - mouseClickPosY;
+				var r1 = mouseClickRadius;
+				var r2 = ballRadius;
+				var dist2 = distX*distX + distY*distY; // distance
+				 //두 중심으로 부터 거리 <= 반지름의 합 이면서 중심으로부터 거리 > 마우스의 반지름이고 공이 마우스보다 위쪽에 있을 때 충돌
+				if (dist2 <= (r1 + r2)*(r1 + r2) && dist2 > r2*r2 && mouseClickPosY > y){
+					ballPower = (r1 + r2)*(r1 + r2) / dist2;
+					
+					dy = -15;		
+					dx = ballPower * Math.floor(-1*distX/ (distY * Math.cos(Math.atan(distY/distX))*Math.cos(Math.atan(distY/distX)))) % 15
+					//x축으로의 이동거리는 arctan값에 정비례
+					scores++;
+				}
+			}
+			
+			
+			/* Key Event */
+			document.addEventListener("keydown", keyDownHandler);
+			document.addEventListener("keyup", keyUpHandler);
+			document.addEventListener("mousedown", mouseClickHandler);
+			document.addEventListener("mouseup", function(){
+				if(mouseClicked) mouseClicked = false;
+				mouseClickPosX = -10000;
+				mouseClickPosY = -10000;
+				ballPower = 0;
+			});
+			
+			function keyDownHandler(e){
+				if(e.keyCode == 39) rightPressed = true;
+				else if(e.keyCode == 37) leftPressed = true;
+			}
+			function keyUpHandler(e){
+				if(e.keyCode == 39) rightPressed = false;
+				else if(e.keyCode == 37) leftPressed = false;			
+			}
+			function mouseClickHandler(e){
+				var relativeX = e.clientX - canvas.offsetLeft;
+				var relativeY = e.clientY - canvas.offsetTop;
+				if(relativeX > 0 && relativeX < canvas.width && relativeY > 0 && relativeY < canvas.height){
+					mouseClickPosX = relativeX;
+					mouseClickPosY = relativeY;
+				}
+				mouseClicked = true;
+			}
+			/* End Key Event */
+			
+			
+			
+			function ballGravity(){ //나중에 난이도 설정할때 유용
+				var G = 0.75;
+				if(dy + G <= gravity)
+					dy += G;
+			}
+			
+			function drawScore(){
+				ctx.font = "16px Arial";
+				ctx.fillStyle = "#0095DD";
+				ctx.fillText("Score: " + scores, canvas.width -90, 20);
+			}
+		
+			var EFFECT;
+			function drawMouseClickEffect(){
+				ctx.beginPath();
+				ctx.arc(mouseClickPosX, mouseClickPosY, mouseClickRadius, 0, Math.PI*2);
+				ctx.strokeStyle = "black";
+				ctx.stroke();
+				ctx.closePath();
+			}
+		
+			function drawBall(){
+				ctx.beginPath();
+				ctx.arc(x, y, ballRadius, 0, Math.PI*2);
+				ctx.fillStyle = "#0095DD";
+				ctx.fill();
+				ctx.closePath();
+			}
+			
+			function draw(){
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				drawBall();
+				drawScore();
+				if(mouseClicked){
+					drawMouseClickEffect();
+				}
+					
+				x += dx;
+				y += dy;
+				
+				CollisionDetection();		
+				
+				if(x + dx > canvas.width - ballRadius || x + dx < ballRadius) //캔버스 벽
+					dx = -dx;
+				else if (y + dy < ballRadius){
+					dy = -dy;
+				}
+				if (y + dy > canvas.height + ballRadius){
+					dy = 0;
+					//document.location.reload();
+				}
+				else	//부딪칠때는 똑같은 속도로 올라오기 때문에 중력 적용 X
+					ballGravity();
+				
+				//Ball Move
+				if(rightPressed && x < canvas.width - ballRadius && dx+1 <= 3)dx++;
+				else if(leftPressed && x > ballRadius && dx - 1 >= -3) dx--;
+
+				requestAnimationFrame(draw);
+			}
+			draw();
+			
+		</script>
+	</body>
+</html>

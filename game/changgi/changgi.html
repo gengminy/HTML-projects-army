@@ -1,0 +1,989 @@
+<!Doctype html>
+<html>
+	<head>
+		<meta charset = "UTF-8">
+		
+		<style>
+			body{
+				overflow: hidden;
+				user-select: none;
+			}
+			
+			
+			.basement{
+				background: black;
+				border: #EE9147 50px solid;
+				z-index: -10000;
+				min-height: 774px;
+				min-width: 774px;
+				
+				position: absolute;
+				top:10px;
+				left: 10px;
+			}	
+			.basement td{
+				border: black 1px solid;
+				width: 80px;
+				height: 80px;
+				margin: 0px;
+				padding: 0px;
+				background: #EE9147;
+			}
+			
+			.chessmanBoard{
+				z-index: 10;		
+				position: absolute;
+				padding: 8px;
+				top: 10px;
+				left: 10px;
+				
+				min-width: 774px;
+				min-height: 774px;
+				
+			}
+			.chessmanBoard td{
+				width:82px;
+				height: 82px;
+				padding:0;
+				border: 0;
+				text-align: center;
+			}
+			
+			.chessmanBoard:not(.moveTo){
+				background: transparent;		
+			}
+			
+			.td_lefttop{
+				border-bottom-right-radius: 7px;
+			}
+			.td_righttop{
+				border-bottom-left-radius: 7px;
+			}
+			.td_leftbottom{
+				border-top-right-radius: 7px;
+			}
+			.td_rightbottom{
+				border-top-left-radius: 7px;
+			}
+			.td_castle{
+				width: 115px;
+				height: 115px;
+				margin-left: 23px;
+				
+				transform: rotate(45deg);
+				position: absolute;				
+			}
+			
+			.td_castle.top{ margin-top: -99px; border-bottom: 4px solid black; border-right: 4px solid black;}
+			.td_castle.bottom{ margin-top: -20px; border-top: 4px solid black; border-left: 4px solid black; }
+			
+			
+			.board2{
+				position: absolute;
+				margin: 20px;
+				top: 9px;
+				left: 9px;
+				z-index: 1;
+			}
+			.board2 td{
+				width: 39px;
+				height: 39px;
+				margin: 0px;
+				padding: 0px;
+				border: 0px;
+				text-align: center;
+			}
+			.board2 td:hover{
+				opacity: 0.5;
+				background: red;
+				border-radius: 100%;
+				transition: 0.2s;
+			}
+			
+			span{
+				cursor: default;
+			}
+			.timer1{
+				position: absolute;
+				border: black 1px solid;
+				width: 200px;
+				height: 150px;
+				left: 881px;
+				top: 10px;
+				background: black;
+				color: white;
+				z-index: -5000;
+				opacity: 0.9;
+				text-align: center;
+				transition: 1s;				
+			}
+			#turnText{
+				font-size: 50px;
+				display: block;
+				font-weight: bold;
+			}
+			#turnTime{
+				margin-top: 10px;
+				font-size: 30px;
+				display: block;
+				font-weight: 600;				
+			}
+			.dText{
+				font-size: 15px;
+			}
+			
+			
+			.moveTo p{
+				color: red;
+				font-size: 30px;
+				opacity: 0.7;
+				border-radius: 50%;
+				margin: 0 auto;
+				cursor: pointer;
+				transform: translate(0, -5px);
+			}
+			.moveTo canvas{
+				transform: translate(-41px, -20px);
+			}
+			
+			.chessMan{
+				width:82px;
+				height:82px;
+				position: absolute;
+				cursor: pointer;
+				transform: translate(-41px, -40px);
+			}
+
+			.background-img{
+				background: url("./img/title.chgi");
+				background-size: 100% 100%;			
+			}
+			.main-board{
+				position: absolute;
+				font-family: 궁서;
+				text-align: center;
+				width: 800px;
+				height: 700px;
+			}
+			.main-board h1{ line-height: 300px; font-size: 100px; margin: 0 0 210px 0; text-shadow: 0 0 30px #FFF; -webkit-text-stroke: medium }
+			.main-board button{ width: 400px; margin: 10px; height: 40px; font-size: 30px; font-family: 궁서; }
+			
+
+			.chessman-option label{ margin: 30px; padding: 30px;}
+			.chessman-option label:last-child{ display: block; }
+			.chessman-option span{ padding: 30px; margin: 10px; }
+			.chessman-option h2{ font-size: 40px; line-height: 20px; }
+			.select-wrapper{ display: inline-block; }
+			
+			.select-wrapper input[type='radio']{
+				-webkit-appearance: none !important;
+				border: 0; padding: 0; margin:0;
+			}
+			.select-wrapper input[type='radio']:checked + span{
+				background: red;
+			}
+			.team-select-wrapper p{ margin-bottom: 40px; font-size: 20px; line-height: 40px; font-weight: bold; }
+		</style>
+	</head>
+	<body>
+		<div id="main" class="main-board background-img">
+			<h1>앤시시 장기</h1>
+			<button onclick="GAME.Open2ndBoard()">대국시작</button>
+			<button>설정</button>
+		</div>
+		
+		
+		<div class="main-board background-img chessman-option" style="display:none">
+			<h2>말 순서 선택</h2>
+			<div class="team-select-wrapper">
+				<p>초나라</p>
+				<div class="select-wrapper">
+					<label><input type="radio" name="CHO_LEFT" value=0 oninput="GAME.SetChessManPosOption(0, 0)" checked></input><span id="CHOLEFT1_1"></span><span id="CHOLEFT1_2"></span></label>
+					<label><input type="radio" name="CHO_LEFT" value=1 oninput="GAME.SetChessManPosOption(0, 1)"></input><span id="CHOLEFT2_1"></span><span id="CHOLEFT2_2"></span></label>
+				</div>
+				
+				<div class="select-wrapper">
+					<label><input type="radio" name="CHO_RIGHT" value=0 oninput="GAME.SetChessManPosOption(1, 0)" checked></input><span id="CHORIGHT1_1"></span><span id="CHORIGHT1_2"></span></label>
+					<label><input type="radio" name="CHO_RIGHT" value=1 oninput="GAME.SetChessManPosOption(1, 1)"></input><span id="CHORIGHT2_1"></span><span id="CHORIGHT2_2"></span></label>
+				</div>
+			</div>
+			<div class="team-select-wrapper">
+				<p>한나라</p>
+				<div class="select-wrapper">
+					<label><input type="radio" name="HAN_LEFT" value=0 oninput="GAME.SetChessManPosOption(2, 0)" checked></input><span id="HANLEFT1_1"></span><span id="HANLEFT1_2"></span></label>
+					<label><input type="radio" name="HAN_LEFT" value=1 oninput="GAME.SetChessManPosOption(2, 1)"></input><span id="HANLEFT2_1"></span><span id="HANLEFT2_2"></span></label>
+				</div>
+				
+				<div class="select-wrapper">
+					<label><input type="radio" name="HAN_RIGHT" value=0 oninput="GAME.SetChessManPosOption(3, 0)" checked></input><span id="HANRIGHT1_1"></span><span id="HANRIGHT1_2"></span></label>
+					<label><input type="radio" name="HAN_RIGHT" value=1 oninput="GAME.SetChessManPosOption(3, 1)"></input><span id="HANRIGHT2_1"></span><span id="HANRIGHT2_2"></span></label>
+				</div>
+			</div>
+			
+			<button onclick="GAME.Open3rdBoard()">완료</button>
+		</div>
+		
+	
+		<div id="chessBoard" class="chessBoard" style="display:none">
+		</div>
+
+		
+		
+		<script>
+				
+				
+			let GAME = {
+				STATEMENT: "GAME",
+				
+				TURN: "CHO",
+				
+				COLOR: ["CHO", "HAN"],
+				
+				MAP: [],
+				
+				CHESSMANTYPE:["車", "馬", "象", "卒", "士", "漢", "楚", "兵"],
+				
+				CURSELECT: null,
+				
+				MOVELIST:{
+					CHA: [[1,0],[-1,0],[0,1],[0,-1]], //차
+					MA: [[-2,-1],[-2,1],[-1,2],[1,2],[2,1],[2,-1],[1,-2],[-1,-2]], //마
+					SANG: [[2,3],[3,2],[3,-2],[2,-3],[-2,-3],[-3,-2],[-3,2],[-2,3]], //상
+					ZOL: [[1,0],[0,1],[0,-1]], //졸
+					BYEONG: [[-1,0],[0,1],[0,-1]], //병
+					CASTLE: [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[-1,-1],[1,-1]], //궁(초, 한)
+					SA: [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[-1,-1],[1,-1]] //사
+				},
+				
+				CHESSMANPOSOPTION: [0, 0, 0, 0],
+				
+				
+				//마상 / 상마 순서 정하는 창 띄움
+				RequestChessManOption: function(){
+					this.DrawChessMan(-1, -1, "MA", color="CHO", diff=9, document.getElementById("CHOLEFT1_1"));
+					this.DrawChessMan(-1, -1, "SANG", color="CHO", diff=9, document.getElementById("CHOLEFT1_2"));
+					this.DrawChessMan(-1, -1, "SANG", color="CHO", diff=9, document.getElementById("CHOLEFT2_1"));
+					this.DrawChessMan(-1, -1, "MA", color="CHO", diff=9, document.getElementById("CHOLEFT2_2"));
+				
+					this.DrawChessMan(-1, -1, "MA", color="CHO", diff=9, document.getElementById("CHORIGHT1_1"));
+					this.DrawChessMan(-1, -1, "SANG", color="CHO", diff=9, document.getElementById("CHORIGHT1_2"));
+					this.DrawChessMan(-1, -1, "SANG", color="CHO", diff=9, document.getElementById("CHORIGHT2_1"));
+					this.DrawChessMan(-1, -1, "MA", color="CHO", diff=9, document.getElementById("CHORIGHT2_2"));
+					
+					this.DrawChessMan(-1, -1, "MA", color="HAN", diff=9, document.getElementById("HANLEFT1_1"));
+					this.DrawChessMan(-1, -1, "SANG", color="HAN", diff=9, document.getElementById("HANLEFT1_2"));
+					this.DrawChessMan(-1, -1, "SANG", color="HAN", diff=9, document.getElementById("HANLEFT2_1"));
+					this.DrawChessMan(-1, -1, "MA", color="HAN", diff=9, document.getElementById("HANLEFT2_2"));
+				
+					this.DrawChessMan(-1, -1, "MA", color="HAN", diff=9, document.getElementById("HANRIGHT1_1"));
+					this.DrawChessMan(-1, -1, "SANG", color="HAN", diff=9, document.getElementById("HANRIGHT1_2"));
+					this.DrawChessMan(-1, -1, "SANG", color="HAN", diff=9, document.getElementById("HANRIGHT2_1"));
+					this.DrawChessMan(-1, -1, "MA", color="HAN", diff=9, document.getElementById("HANRIGHT2_2"));
+				},
+				
+				SetChessManPosOption: function(order, val){
+					this.CHESSMANPOSOPTION[order] = val;
+					
+					console.log(this.CHESSMANPOSOPTION);
+				},
+				
+				OpenBoard: function(order){
+					let children = document.body.children;
+					for(let i=0; i< children.length; ++i){
+						children[i].style.display = "none";
+					}
+					children[order-1].style.display = "block";
+				},
+				
+				Open2ndBoard: function(){
+					this.OpenBoard(2);
+					this.RequestChessManOption();
+				},
+				
+				Open3rdBoard: function(){
+					GAME.InitializeChessMan();
+					GAME.SetAllChessManMoveList();
+					this.OpenBoard(3);
+				},
+				
+				//체스판 생성
+				RenderChessBoard_basement: function($DIV){
+					for(let i=0; i<$DIV.childElementCount; ++i){
+						$DIV.children[i].remove();
+					}
+					
+					let $TABLE = document.createElement("table");
+					$TABLE.className = "basement"
+					
+					let $TR, $TD, $SECTION;
+					for(let i=1; i<=8; ++i){
+						$TR = document.createElement("tr");
+						for(let j=1; j<=8; ++j){
+							$TD = document.createElement("td");
+							
+							if((i==1||i==7)&&j==4){
+								$SECTION = document.createElement("div");
+								$SECTION.className = "td_castle top";
+								$TD.appendChild($SECTION);
+							}
+							if((i==2||i==8)&&j==4){
+								$SECTION = document.createElement("div");
+								$SECTION.className = "td_castle bottom";
+								$TD.appendChild($SECTION);
+							}
+							
+							
+							if(i==2||i==6){
+								if(j==1||j==7) $TD.classList.add("td_lefttop");
+								if(j==2||j==8) $TD.classList.add("td_righttop");
+							}
+							if(i==3||i==7){
+								if(j==1||j==7) $TD.classList.add("td_leftbottom");
+								if(j==2||j==8) $TD.classList.add("td_rightbottom");
+							}
+							
+							if(i==3||i==5){
+								if(j%2) $TD.classList.add("td_righttop");
+								else $TD.classList.add("td_lefttop");
+							}
+							if(i==4||i==6){
+								if(j%2) $TD.classList.add("td_rightbottom");
+								else $TD.classList.add("td_leftbottom");
+							}
+							$TR.appendChild($TD);
+						}
+						$TABLE.appendChild($TR);
+					}
+					$DIV.appendChild($TABLE);
+				},
+				
+				//체스판 말 위치판 생성
+				RenderChessBoard_chessManBoard: function($DIV){
+					let $TABLE = document.createElement("table");
+					$TABLE.className = "chessmanBoard";
+					let $TR, $TD;
+					
+					for(let i=1; i<=9; ++i){
+						$TR= document.createElement("tr");
+						for(let j=1; j<=9; ++j){
+							$TD= document.createElement("td");
+							$TD.id=i+""+j;
+							$TR.appendChild($TD);
+						}
+						$TABLE.appendChild($TR);
+					}
+					$DIV.appendChild($TABLE);
+				},
+				
+				//맵 0으로 초기화
+				InitializeMap: function(){
+					this.MAP = [];
+					for(let i=0; i<9; i++){
+						this.MAP[i] = [0,0,0,0,0,0,0,0,0];
+					}
+				},
+				
+				//특정 말 하나 그림
+				DrawChessMan: function(col, row, type, color="CHO", diff=1, $paste){
+					let $canvas = document.createElement("canvas");
+					$canvas.className = "chessMan";
+					$canvas.id = color + "_" + CHESSMAN.getTypeEN(type) + "_" + diff;
+					
+					let ctx = $canvas.getContext("2d");
+					
+					let w = 300; //캔버스 기본 너비
+					let h = 150; //캔버스 기본 높이
+					
+					let size; //돌크기
+					
+					
+					//말 크기별 리스트
+					let list1 = ["ZOL", "BYEONG", "SA"];
+					let list2 = ["CHA", "MA", "SANG", "PHO"];
+					let list3 = ["HAN", "CHO"];
+				
+					if(list1.indexOf(type)>-1) size=70;
+					else if(list2.indexOf(type)>-1) size=100;
+					else if(list3.indexOf(type)>-1) size=130;
+					else size = 0;
+					//사이즈 지정
+					
+					
+					
+					let sideX = (Math.sqrt(2)-1)*size*2; //한변길이
+					let sideY = (Math.sqrt(2)-1)*size; //한변길이
+					
+					let x = (w-size*2)/2; // x축 위치 보정
+					let y = (h-size)/2; //y축 위치 보정
+					
+					let diaX = (1-Math.sqrt(2)/2)*size*2; //대각선 x/y축 길이
+					let diaY = (1-Math.sqrt(2)/2)*size; //대각선 x/y축 길이
+					
+					//
+					ctx.beginPath();
+					
+					ctx.moveTo(x+diaX, y);
+					ctx.lineTo(x+diaX+sideX, y);
+					ctx.lineTo(x+diaX*2+sideX, y+diaY);
+					ctx.lineTo(x+diaX*2+sideX, y+diaY+sideY);
+					ctx.lineTo(x+diaX+sideX, y+diaY*2+sideY);
+					ctx.lineTo(x+diaX, y+diaY*2+sideY);
+					ctx.lineTo(x, y+diaY+sideY);
+					ctx.lineTo(x, y+diaY);
+					ctx.shadowColor = "rgba(200, 200, 200, 5)";
+					ctx.shadowOffsetY = 12;
+					ctx.fillStyle = "white";
+					ctx.fill();
+					//돌 그리기
+					
+					
+					ctx.font = diaX*5/2 + "px 돋움";
+					ctx.textAlign = "center";
+					ctx.shadowOffsetY = 1;
+					
+					if(color=="HAN"){
+						ctx.fillStyle = "red";
+						ctx.shadowColor = "rgba(230, 0, 0, 5)";
+					}
+					else if(color=="CHO"){
+						ctx.fillStyle = "green";
+
+						ctx.shadowColor = "rgba(0, 230, 0, 5)";
+					}
+
+					
+					ctx.transform(1,0,0,0.5,0,0)
+					ctx.fillText(CHESSMAN.getTypeCH(type), w/2, h+diaY/2+sideY);
+					
+					//글자 그리기
+					
+					ctx.closePath();
+					//
+					
+					ctx.onclick=function(){console.log(1)};
+
+					if($paste != null) $paste.appendChild($canvas);
+					else{						
+						let $elem = POSITION.get$Elem(col,row);
+						if($elem==null) return;					
+						$elem.appendChild($canvas);
+					}
+				},
+			
+			
+				//말 DOM과 맵 내부 객체 연결
+				InitializeChessMan: function(CL=this.CHESSMANPOSOPTION[0], CR=this.CHESSMANPOSOPTION[1], HL=this.CHESSMANPOSOPTION[2], HR=this.CHESSMANPOSOPTION[3]){
+					this.MAP[0][0] = new CHESSMAN(1, 1, "車", "CHO", 1);
+					
+					if(CL){
+						this.MAP[0][1] = new CHESSMAN(1, 2, "象", "CHO", 1);
+						this.MAP[0][2] = new CHESSMAN(1, 3, "馬", "CHO", 1);
+					}
+					else{
+						this.MAP[0][1] = new CHESSMAN(1, 2, "馬", "CHO", 1);
+						this.MAP[0][2] = new CHESSMAN(1, 3, "象", "CHO", 1);
+					}
+					
+					this.MAP[0][3] = new CHESSMAN(1, 4, "士", "CHO", 1);
+					this.MAP[1][4] = new CHESSMAN(2, 5, "楚", "CHO", 1);
+					this.MAP[0][5] = new CHESSMAN(1, 6, "士", "CHO", 2);
+					
+
+					
+					if(CR){
+						this.MAP[0][6] = new CHESSMAN(1, 7, "象", "CHO", 2);					
+						this.MAP[0][7] = new CHESSMAN(1, 8, "馬", "CHO", 2);
+					}
+					else{
+						this.MAP[0][6] = new CHESSMAN(1, 7, "馬", "CHO", 2);
+						this.MAP[0][7] = new CHESSMAN(1, 8, "象", "CHO", 2);						
+					}
+					this.MAP[0][8] = new CHESSMAN(1, 9, "車", "CHO", 2);
+					
+					this.MAP[2][1] = new CHESSMAN(3, 2, "包", "CHO", 1);
+					this.MAP[2][7] = new CHESSMAN(3, 8, "包", "CHO", 2);
+					
+					
+					this.MAP[3][0] = new CHESSMAN(4, 1, "卒", "CHO", 1);
+					this.MAP[3][2] = new CHESSMAN(4, 3, "卒", "CHO", 2);
+					this.MAP[3][4] = new CHESSMAN(4, 5, "卒", "CHO", 3);
+					this.MAP[3][6] = new CHESSMAN(4, 7, "卒", "CHO", 4);
+					this.MAP[3][8] = new CHESSMAN(4, 9, "卒", "CHO", 5);
+
+
+					
+					this.MAP[8][0] = new CHESSMAN(9, 1, "車", "HAN", 1);
+					
+					if(HL){
+						this.MAP[8][1] = new CHESSMAN(9, 2, "象", "HAN", 1);		
+						this.MAP[8][2] = new CHESSMAN(9, 3, "馬", "HAN", 1);						
+					}
+					else{
+						this.MAP[8][1] = new CHESSMAN(9, 2, "馬", "HAN", 1);
+						this.MAP[8][2] = new CHESSMAN(9, 3, "象", "HAN", 1);
+					}
+					
+					this.MAP[8][3] = new CHESSMAN(9, 4, "士", "HAN", 1);
+					this.MAP[7][4] = new CHESSMAN(8, 5, "漢", "HAN", 1);
+					this.MAP[8][5] = new CHESSMAN(9, 6, "士", "HAN", 2);
+				
+					if(HR){
+						this.MAP[8][6] = new CHESSMAN(9, 7, "象", "HAN", 2);
+						this.MAP[8][7] = new CHESSMAN(9, 8, "馬", "HAN", 2);
+					}
+					else{
+						this.MAP[8][6] = new CHESSMAN(9, 7, "馬", "HAN", 2);
+						this.MAP[8][7] = new CHESSMAN(9, 8, "象", "HAN", 2);
+					}
+					this.MAP[8][8] = new CHESSMAN(9, 9, "車", "HAN", 2);
+					
+
+					this.MAP[6][1] = new CHESSMAN(7, 2, "包", "HAN", 1);
+					this.MAP[6][7] = new CHESSMAN(7, 8, "包", "HAN", 2);
+					
+					
+					this.MAP[5][0] = new CHESSMAN(6, 1, "兵", "HAN", 1);
+					this.MAP[5][2] = new CHESSMAN(6, 3, "兵", "HAN", 2);
+					this.MAP[5][4] = new CHESSMAN(6, 5, "兵", "HAN", 3);
+					this.MAP[5][6] = new CHESSMAN(6, 7, "兵", "HAN", 4);
+					this.MAP[5][8] = new CHESSMAN(6, 9, "兵", "HAN", 5);				
+			
+				},
+				
+				
+				ClearAllMoveToClass: function(){
+					for(let i=1; i<=9; ++i){
+						for(let j=1; j<=9; ++j){
+							let $elem = POSITION.get$Elem(i, j);
+							$elem.classList.remove("moveTo");
+							for(let i=0; i<$elem.childElementCount; ++i){
+								if($elem.children[i].tagName=="P"){ 
+									$elem.children[i].remove();
+								}
+							}
+						}
+					}
+				},
+				
+				SetAllChessManMoveList: function(){
+					for(let i=0; i<9; ++i){
+						for(let j=0; j<9; ++j){
+							if(typeof(this.MAP[i][j])=="object") this.MAP[i][j].setNextMoveList();
+						}
+					}
+				},
+				
+				
+				ToggleTurn: function(){
+					this.SetAllChessManMoveList();
+					if(this.TURN == "CHO"){
+						this.TURN = "HAN";
+					}
+					else if(this.TURN == "HAN"){
+						this.TURN = "CHO";
+					}
+				}
+			}
+			
+			
+			class CHESSMAN{
+				constructor(col=1, row=1, type="ZOL", color="CHO", diff=1, $link=null){
+				
+					if(!POSITION.isValid(col,row)) throw("CHESSMAN CONSTRUCTOR ERROR: POSITION IS INVALID");
+					
+					//좌표지정
+					this.column = col;
+					this.row = row;
+					
+					//말 타입 지정
+					this.type = CHESSMAN.getTypeEN(type);
+					this.moveList = this.getMoveList();
+					
+					//팀 지정
+					this.color = color;
+					this.diff = diff;
+					
+					//말을 캔버스로 그림
+					GAME.DrawChessMan(this.column, this.row, this.type, this.color, this.diff);				
+				
+					//캔버스와 링크 걸어줌
+					if($link!=null) this.$link = $link;
+					else this.findLink();
+					
+					//이동 가능한 칸
+					this.nextPossibleMoveList = this.getPossibleMoveList(); //setNextMoveList()
+					
+					//클릭하면  이동할수 있는 칸 뜨게함
+					this.setLinkClickEvent();
+					
+					if(this.type == "CHO" || this.type == "HAN" || this.type == "SA"){
+						this.inCastle = function(){
+							
+						
+						}
+					}
+				}
+				
+				
+				getType = () => this.type;
+				getPos = () => [this.column,this.row];
+				getColor = () => this.color;
+				getMoveList = () => CHESSMAN.getMoveList(this.type);
+				
+				
+				//궁 내부를 9분할하여 나타냄
+				getInCastleElement(){
+					if(this.column%6==1){
+						if(this.row==4) return 1;
+						if(this.row==5) return 2;
+						if(this.row==6) return 3;
+					}
+					else if(this.column%6==2){
+						if(this.row==4) return 4;
+						if(this.row==5) return 5;
+						if(this.row==6) return 6;
+					}
+					else if(this.column%6==3){
+						if(this.row==4) return 7;
+						if(this.row==5) return 8;
+						if(this.row==6) return 9;
+					}
+					return 0;
+				}
+				
+				//이동가능한 칸 조사
+				getPossibleMoveList(){
+					let result = [];
+					let mul=1;
+					
+					let newPos = [];
+										
+					//직선으로 움직이는 것들 궁안에 있을때 이동 가능한 칸 조정
+					switch(this.type){
+						case "CHA":
+						switch(this.getInCastleElement()){
+							case 1: 
+								if(GAME.MAP[this.column+1-1][this.row+1-1] == 0)
+								newPos.push([this.column+2,this.row+2]); break;
+							case 3:
+								if(GAME.MAP[this.column+1-1][this.row-1-1] == 0)
+								newPos.push([this.column+2,this.row-2]); break;
+							case 7:
+								if(GAME.MAP[this.column-1-1][this.row+1-1] == 0)
+								newPos.push([this.column-2,this.row+2]); break;
+							case 9:
+								if(GAME.MAP[this.column-1-1][this.row-1-1] == 0)
+								newPos.push([this.column-2,this.row-2]); break;
+						}
+						
+						case "ZOL": case "BYEONG":
+						switch(this.getInCastleElement()){
+							case 1: newPos.push([this.column+1,this.row+1]); break;
+							case 3: newPos.push([this.column+1,this.row-1]); break;
+							case 5: newPos.push([this.column+1,this.row+1]);
+									newPos.push([this.column+1,this.row-1]);
+									newPos.push([this.column-1,this.row+1]);
+									newPos.push([this.column-1,this.row-1]);
+									break;
+							case 7: newPos.push([this.column-1,this.row+1]); break;
+							case 9: newPos.push([this.column-1,this.row-1]); break;
+						}
+						
+						for(let i=0; i<newPos.length; ++i){
+							if(this.getCollisionElement(GAME.MAP[newPos[i][0]-1][newPos[i][1]-1]) != "EQUAL"){
+								result.push(newPos[i]);
+							}
+						}
+						
+						break;
+						
+						
+						
+						case "PHO":
+						switch(this.getInCastleElement()){
+							case 1: 
+								if(GAME.MAP[this.column+1-1][this.row+1-1]!=0&&GAME.MAP[this.column+1-1][this.row+1-1].type!="PHO")
+								newPos.push([this.column+2,this.row+2]); break;
+							case 3:
+								if(GAME.MAP[this.column+1-1][this.row-1-1]!=0&&GAME.MAP[this.column+1-1][this.row-1-1].type!="PHO")
+								newPos.push([this.column+2,this.row-2]); break;
+							case 7:
+								if(GAME.MAP[this.column-1-1][this.row+1-1]!=0&&GAME.MAP[this.column-1-1][this.row+1-1].type!="PHO")
+								newPos.push([this.column-2,this.row+2]); break;
+							case 9:
+								if(GAME.MAP[this.column-1-1][this.row-1-1]!=0&&GAME.MAP[this.column-1-1][this.row-1-1].type!="PHO")
+								newPos.push([this.column-2,this.row-2]); break;
+						}
+						for(let i=0; i<newPos.length; ++i){
+							if(this.getCollisionElement(GAME.MAP[newPos[i][0]-1][newPos[i][1]-1]) != "EQUAL"){
+								result.push(newPos[i]);
+							}
+						}
+						
+						break;
+						
+						case "CHO": case "HAN": case "SA":
+						switch(this.getInCastleElement()){
+							case 1: this.moveList=[[0,1],[1,0],[1,1]]; break;
+							case 2: this.moveList=[[0,1],[0,-1],[1,0]]; break;
+							case 3: this.moveList=[[0,-1],[1,0],[1,-1]]; break;
+							case 4: this.moveList=[[-1,0],[1,0],[0,1]]; break;
+							case 5: this.moveList = this.getMoveList(); break;
+							case 6: this.moveList=[[-1,0],[1,0],[0,-1]]; break;
+							case 7: this.moveList=[[-1,0],[0,1],[-1,1]]; break;
+							case 8: this.moveList=[[0,-1],[0,1],[-1,0]]; break;
+							case 9: this.moveList=[[-1,0],[0,-1],[-1,-1]]; break;
+						}
+						break;
+					}
+					
+					
+					////////
+					
+					
+					switch(this.type){
+						case "CHA": mul=8;
+						
+						break;
+						case "PHO":
+						for(let i=0; i<this.moveList.length; ++i){
+							let check = 0;
+							for(let j=1; j<=8; ++j){
+								let newCol = this.column + this.moveList[i][0]*j
+								let newRow = this.row + this.moveList[i][1]*j;
+								if(POSITION.isValid(newCol, newRow)){
+
+									let collision = this.getCollisionElement(GAME.MAP[newCol-1][newRow-1]);
+									if(collision == "EQUAL_PHO"){
+										break;
+									}
+									else if(collision=="EQUAL"){
+										if(!check){ check=1; }
+										else break;
+									}
+									else if(collision=="INEQUAL"){
+										if(!check){ check=1; }
+										else{ result.push([newCol,newRow]); break; }
+									}
+									else if(check && collision=="EMPTY"){
+										result.push([newCol,newRow]);
+									}						
+								}
+								else break;
+							}
+						}
+						return result;
+						
+						case "MA": case "SANG":
+							for(let i=0; i<this.moveList.length; ++i){
+								let relativeC, relativeR;
+								
+								if(this.type=="SANG"){
+									relativeC = this.column + Math.trunc(this.moveList[i][0]/3);
+									relativeR = this.row + Math.trunc(this.moveList[i][1]/3);
+								}
+								else{
+									relativeC = this.column + Math.trunc(this.moveList[i][0]/2);
+									relativeR = this.row + Math.trunc(this.moveList[i][1]/2);
+								}
+								let newCol = this.column + this.moveList[i][0];
+								let newRow = this.row + this.moveList[i][1];
+
+								
+								if(POSITION.isValid(newCol, newRow)){
+									let collision1 = this.getCollisionElement(GAME.MAP[relativeC-1][relativeR-1]);
+									let collision3 = this.getCollisionElement(GAME.MAP[newCol-1][newRow-1]);								
+									
+									if(this.type=="SANG"){
+										relativeC = relativeC + Math.trunc(this.moveList[i][0]/2);
+										relativeR = relativeR + Math.trunc(this.moveList[i][1]/2);
+										let collision2 = this.getCollisionElement(GAME.MAP[relativeC-1][relativeR-1]);
+										
+										if(collision1=="EMPTY"&&collision2=="EMPTY"&&collision3!="EQUAL")
+											result.push([newCol,newRow]);
+									}
+									else{
+										if(collision1=="EMPTY"&&collision3!="EQUAL")
+											result.push([newCol,newRow]);
+									}
+								}
+							}
+						return result;
+					}
+					for(let i=0; i<this.moveList.length; ++i){
+						
+						for(let j=1; j<=mul; ++j){
+							let newCol = this.column + this.moveList[i][0]*j
+							let newRow = this.row + this.moveList[i][1]*j;
+							
+							
+							if(POSITION.isValid(newCol, newRow)){
+								let collision = this.getCollisionElement(GAME.MAP[newCol-1][newRow-1]);
+								
+								
+								if(collision=="EQUAL") break;
+								else if(collision=="INEQUAL"){ result.push([newCol,newRow]); break; }
+								result.push([newCol,newRow]);
+							}
+							else break;
+						}
+					}
+					
+
+					
+					return result;
+				}
+				
+				//충돌 요소 조사
+				getCollisionElement(comp){
+					
+				
+					if(comp == 0) return "EMPTY";
+					
+					if(this.type=="PHO" && comp.type=="PHO") return "EQUAL_PHO"; //포끼리 충돌
+					
+					if(this.color == comp.color) return "EQUAL"; //같은팀
+					if(this.color != comp.color) return "INEQUAL"; //다른팀			
+				}
+				
+				findLink = ()=>{ this.$link = POSITION.get$Elem(this.column,this.row).children[0]; }
+				
+				//링크(캔버스) 클릭시 이벤트 지정
+				setLinkClickEvent = ()=>{
+					this.$link.onclick = () => { this.toggleSelection(); }
+				}
+				//다음 이동가능한 칸 조사
+				setNextMoveList(){ this.nextPossibleMoveList = this.getPossibleMoveList(); }
+				
+				
+				//선택, 초기화
+				toggleSelection(){
+					GAME.ClearAllMoveToClass();
+					if(GAME.CURSELECT == this){
+						GAME.CURSELECT = null;
+					}
+					else{
+						GAME.CURSELECT = this;
+						let M = this.nextPossibleMoveList;
+						for(let i=0; i<M.length; ++i){
+							if(POSITION.isValid(M[i][0],M[i][1])){
+								let $elem = POSITION.get$Elem(M[i][0],M[i][1]);
+								let $p = document.createElement("p");
+								$p.innerText = "●";
+								$elem.appendChild($p);
+								
+								$p.onclick = function(){
+									GAME.CURSELECT.move(M[i][0], M[i][1]);
+								}
+								
+								$elem.classList.add("moveTo");
+							}
+						}
+					}
+				}
+				
+				
+				//이동
+				
+				move(col, row){
+					if(POSITION.isValid(col,row)){
+						//맵상에서 객체 이동
+						GAME.MAP[col-1][row-1] = this;
+						GAME.MAP[this.column-1][this.row-1] = 0;
+						
+						//DOM 요소 이동
+						POSITION.get$Elem(col, row).innerHTML = "";
+						POSITION.get$Elem(col, row).appendChild(this.$link);
+						
+						//값 조정
+						this.column = col;
+						this.row = row;
+						
+						
+						
+					}
+					
+					//맵상 P 요소와  moveTo Class 제거
+					GAME.ClearAllMoveToClass();
+					//턴 넘기기
+					GAME.ToggleTurn();
+				}
+				
+				
+				static getMoveList(type){
+					switch(type){
+						case "CHA": return GAME.MOVELIST["CHA"];
+						case "MA": return GAME.MOVELIST["MA"]
+						case "SANG": return GAME.MOVELIST["SANG"];
+						case "PHO": return GAME.MOVELIST["CHA"];
+						case "SA": return GAME.MOVELIST["SA"];
+						case "ZOL": return GAME.MOVELIST["ZOL"];
+						case "BYEONG": return GAME.MOVELIST["BYEONG"];
+						case "CHO": return GAME.MOVELIST["CASTLE"];
+						case "HAN": return GAME.MOVELIST["CASTLE"];
+						return 0;
+					}
+				}
+				static getTypeCH(type){
+					switch(type){
+						case "차": case "車": case "CHA": return "車";
+						case "마": case "馬": case "MA": return "馬";
+						case "상": case "象": case "SANG": return "象";
+						case "사": case "士": case "SA": return "士";
+						case "포": case "包": case "PHO": return "包";
+						case "졸": case "卒": case "ZOL": return "卒";
+						case "병": case "兵": case "BYEONG": return "兵";
+						case "초": case "楚": case "CHO": return "楚";
+						case "한": case "漢": case "HAN": return "漢";
+						default: return "NONE";
+					}
+				}
+				static getTypeEN(type){
+					switch(type){
+						case "차": case "車": case "CHA": return "CHA";
+						case "마": case "馬": case "MA": return "MA";
+						case "상": case "象": case "SANG": return "SANG";
+						case "사": case "士": case "SA": return "SA";
+						case "포": case "包": case "PHO": return "PHO";
+						case "졸": case "卒": case "ZOL": return "ZOL";
+						case "병": case "兵": case "BYEONG": return "BYEONG";
+						case "초": case "楚": case "CHO": return "CHO";
+						case "한": case "漢": case "HAN": return "HAN";
+						default: return "NONE";
+					}
+				}				
+			}
+				
+			
+			let POSITION = {
+				get$Elem: function(col, row){
+					return document.getElementById(col+""+row);
+				},
+				getId: function(col, row){
+					if(typeof(col)==="string") col = parseInt(col);
+					if(typeof(row)==="string") row = parseInt(row);		
+					if(col < 10){ col = "0" + col; }
+					if(row < 10){ row = "0" + row; }	
+					return col+""+row;
+				},
+				getPos: function(id){
+					if(typeof(id)==="string")
+						return [parseInt(id[0]+id[1]), parseInt(id[2]+id[3])];
+				},
+				isValid: function(col, row){
+					if(typeof(col)==="string") col = parseInt(col);
+					if(typeof(row)==="string") row = parseInt(row);							
+					if(1 <= col && col <= 9 && 1 <= row && row <= 9) return true;
+					return false;
+				}
+			}
+
+			$ChessBoard = document.querySelector("#chessBoard");
+			GAME.RenderChessBoard_basement($ChessBoard);
+			GAME.RenderChessBoard_chessManBoard($ChessBoard);
+			GAME.InitializeMap();
+
+			
+		</script>
+	</body>
+</html>

@@ -1,0 +1,431 @@
+<!Doctype html>
+<html>
+	<head>
+		<meta charset = "UTF-8">
+		<script type="text/javascript" src="http://tv.dema.mnd.mil/2019/js/jquery-1.11.2.js"></script>
+		
+		
+		<style>
+			body{ overflow: hidden; }
+			.wrapper{ width:98%; height:96vh; margin:0 auto; border: 3px solid gray; border-radius: 30px; overflow: hidden; user-select: none; }
+			.main-title{ height: 6%; margin: 2%; text-align: center; font-size: 2.5em; font-family: "맑은 고딕"; }
+			
+			.match-title{ text-align: center; height: 6%; margin: 1%; }
+			
+			
+			.man-wrapper{ width:96%; height:88%; margin: 1% auto; border-top: 3px solid gray; overflow-y: scroll; }
+			.man-wrapper::-webkit-scrollbar{ display: none; }
+			
+			.man{ width:46%; height: 85%; margin: 0.1%; border: 1px solid black; border-radius: 30px; transition: 0.7s; font-family: "한컴 백제 M"; }
+			
+			.man-left{ float: left; }
+			.man-right{ float: right; }
+			
+			.man-selected{ width: 90%; float: none; }
+			
+			.man-img{ width: 96%; height:80%; margin:2%; }
+			.man-name{ width: 100%; height:10%; }
+			.man-name p{ margin: 0 auto; text-align: center; line-height: 180%; font-weight: bold; font-size: 2.5em; }
+			
+			.man-ul{ list-style: none; }
+			
+			.man-li{ display: flex; width: 95%; padding: 2px; border: 1px solid black; margin: 1%; align-items: center; text-align: center; }
+			.man-li span{ width: 13%; font-size: 4em; margin: 0.5%;}
+			
+			.man-li-title{ width: 95%;}
+			.man-li-title p{  text-align: center; font-size: 2em; margin: 0 auto; font-weight: bold; }
+			.man-li-title span{ float: right; margin: 1%; }
+			.man-li-title b:hover{ color: blue; transition: 0.3s; text-decoration: underline; cursor: pointer; }
+			
+			.man-li-name{ font-size: 2.5em; }
+			
+			.man-li-info{ width: 70%; }
+			.man-li-info p{ margin: 0 auto; }
+			.man-li-info strong{ color: red; font-size: 1.3em;}
+			.man-li-info strong:hover{ transition: 0.3s; text-decoration: underline; cursor: pointer; }
+			.man-li-info b:hover{ color: blue; transition: 0.3s; text-decoration: underline; cursor: pointer; }
+			
+			.man-li-img{ width: 150px; height: 150px; border: 1px solid black; margin: 0.5%; }
+			
+			.man-li-select{ padding: 0; border: 3px solid red; }
+			
+			.input-info{ height: 25%; margin: 200px auto; text-align: center;}
+			.input-info h2{ margin: 5% auto; font-size: 3em; }
+			.input-info input{ width: 50%; height: 80px; font-size: 2.5em; text-align: center; }
+			.input-info button{ margin: 2%; width: 20%; height: 30px; font-size: 1.2em; border: 1px solid gray; padding: 0; opacity: 0.6; }
+			.input-info button:disabled{ opacity: 0.2; }
+			.input-info button:disabled:hover{ opacity: 0.2; }
+			.input-info button:hover{ opacity: 1; }
+			
+			.part-list-popup{ display: flex; justify-content: center; align-items: center; transition: 0.5s; position: absolute; top:1%; left:1%; text-align: center; width: 98%; height: 98%; overflow: hidden; opacity: 0;}
+			.part-list-popup-center{ max-height: 60%; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 50%; background: white; border: 2px solid black; border-radius: 30px; padding: 5%; }
+			
+			.part-list-popup p{ font-size: 1.5em; margin: 3% 0.5% 3% 0.5%; overflow-y: scroll; }
+			.part-list-popup p::-webkit-scrollbar{ width: 10px; }
+			.part-list-popup p::-webkit-scrollbar-thumb{ background: black; border-radius: 10px; }
+			
+			.part-list-popup button{ transition: 0.2s; text-align: center; width: 150px; height: 30px; font-size: 1.2em; padding:0; border:1px solid black; margin-top: 3%; opacity: 0.4 }
+			.part-list-popup button:hover{ opacity: 0.9; }
+		</style>
+	</head>
+	<body>
+		<div class="wrapper">
+			<h1 class="main-title">NCC 이상형 월드컵</h1>
+			<div class="man-wrapper"></div>
+		</div>
+		<script type = "text/javascript">
+			let MEMBER={
+				NAME:[
+					"오마이걸 아린","오마이걸 비니","아이유","레드벨벳 슬기","레드벨벳 조이","레드벨벳 아이린","구구단 세정","프로미스나인 백지헌","프로미스나인 이나경","프로미스나인 장규리",
+					"프로미스나인 박지원","아이즈원 권은비","아이즈원 안유진","아이즈원 장원영","아이즈원 최예나","아이즈원 김민주","아이즈원 사쿠라","ITZY 예지","ITZY 유나","ITZY 류진",
+					"트와이스 나연","트와이스 사나","블랙핑크 제니","블랙핑크 지수","소녀시대 윤아","소녀시대 태연","우주소녀 루다","우주소녀 설아","우주소녀 엑시","미쓰에이 수지",
+					"에이프릴 이나은","에스파 윈터"
+				],
+				SRC:[]
+			}
+			
+			let MATCH={
+				LIST_ORIGIN: [], //매치에 포함된 초기 인덱스
+				LIST_LENGTH: 32, //몇강인지
+				
+				LIST: [], //현재 진행중인 매치
+				CUR_IDX: 0, //현재 진행중인 매치순서
+				CUR_LEVEL: 0, //현재 진행중인 매치의 강 수
+				
+				PARTICIPATE: 0, //참가자수
+				PART_NAME: [], //참가자 명단
+				WINRATE: [], //우승횟수
+				
+				PLAYER: "", //플레이어이름
+				
+				directory: "./img/",
+				
+				$left: null,
+				$right: null,
+				$matchInfo: null,
+				$wrapper: document.querySelector(".man-wrapper"),
+				
+				
+				//초기화면 렌더링
+				render$Input: function(){
+					this.init();
+				
+					this.$wrapper.innerHTML = "<div class='input-info'><h2>당신의 이름을 입력하세요</h2></div>"
+					let $inputWrapper = document.querySelector('.input-info');
+					$inputWrapper.onkeypress = function(e){ if(e.keyCode == 13 && !$btn1.disabled){ $btn1.click(); }}
+					
+					let $div1 = document.createElement("div");
+					let $input = document.createElement("input");
+					$input.oninput = () => { if($input.value.length < 1) $btn1.disabled=true; else $btn1.disabled=false; }
+					$div1.appendChild($input);
+					
+					let $div2 = document.createElement("div");
+					let $btn1 = document.createElement("button");
+					$btn1.onclick = () => { this.PLAYER = $input.value; this.start(); }
+					$btn1.innerText = "시작하기"
+					$btn1.disabled = true;
+					$div2.appendChild($btn1);
+					
+					let $btn2 = document.createElement("button");
+					$btn2.onclick = () => { this.showResult(this.$wrapper); }
+					$btn2.innerText = "결과보기"
+					$div2.appendChild($btn2);
+					
+					$inputWrapper.appendChild($div1);
+					$inputWrapper.appendChild($div2);
+				},
+				
+				start: function(){
+					this.render$DOM();
+					this.setNext();
+					
+					this.$matchInfo.innerText = this.LIST_LENGTH + "강전(1/" + Math.floor(this.LIST_LENGTH/2) + ")";	
+					this.toggleClickEvent(true);
+				},
+				
+				//매치 DOM 렌더링
+				render$DOM: function(){
+					this.$wrapper.innerHTML = "<h2 class='match-title'></h2>";
+					this.$wrapper.innerHTML += "<div class='man man-left'><div class='man-img'></div><div class='man-name'><p></p></div></div>";
+					this.$wrapper.innerHTML += "<div class='man man-right'><div class='man-img'></div><div class='man-name'><p></p></div></div>";
+					
+					this.$left = document.querySelector(".man-left");
+					this.$right = document.querySelector(".man-right");
+					this.$matchInfo = document.querySelector(".match-title");
+				},
+				
+				//매치 초기화
+				init: function(){
+					this.LIST_ORIGIN = [];
+					this.LIST = [];
+					this.CUR_IDX = 0;
+					this.CUR_LEVEL = 0;
+					
+					this.loadData();
+					
+					while(this.LIST_ORIGIN.length < this.LIST_LENGTH){
+						let idx = Math.floor(Math.random() * Date.now()) % this.LIST_LENGTH;
+						if(!this.LIST_ORIGIN.includes(idx)) this.LIST_ORIGIN.push(idx);
+					}
+					this.LIST.push(this.LIST_ORIGIN);
+					
+					let t=1; while(t < this.LIST_LENGTH){ this.LIST.push([]); t*=2; }
+				},
+			
+				//다음 매치 셋업
+				setNext: function(){
+					if(this.LIST[this.CUR_LEVEL].length == 1){ console.log("fin"); return -1; }
+				
+					let LEFT_IDX = this.LIST[this.CUR_LEVEL][2*this.CUR_IDX];
+					let RIGHT_IDX = this.LIST[this.CUR_LEVEL][2*this.CUR_IDX+1];
+					
+					let listlen = Math.floor(this.LIST[this.CUR_LEVEL].length/2);
+					if(listlen < 2) this.$matchInfo.innerText = "결승전(1/1)";
+					else this.$matchInfo.innerText = this.LIST[this.CUR_LEVEL].length + "강전(" + (this.CUR_IDX+1) + "/" + listlen + ")";
+					
+					let $img = this.$left.firstElementChild;
+					if(MEMBER.SRC[LEFT_IDX]) this.set$background($img, MEMBER.SRC[LEFT_IDX]);
+					else this.set$background($img, this.directory + (LEFT_IDX+1) + ".idl");
+					this.$left.lastElementChild.firstElementChild.innerText = MEMBER.NAME[LEFT_IDX];
+					
+					$img = this.$right.firstElementChild;
+					if(MEMBER.SRC[RIGHT_IDX]) this.set$background($img, MEMBER.SRC[RIGHT_IDX]);
+					else this.set$background($img, this.directory + (RIGHT_IDX+1) + ".idl");
+					this.$right.lastElementChild.firstElementChild.innerText = MEMBER.NAME[RIGHT_IDX];
+				},
+				
+				select: function(lr){
+					if(lr == "L"){
+						this.clickAnimation(this.$left);
+						this.LIST[this.CUR_LEVEL+1].push(this.LIST[this.CUR_LEVEL][2*this.CUR_IDX]);
+					}
+					else if(lr == "R"){
+						this.clickAnimation(this.$right);
+						this.LIST[this.CUR_LEVEL+1].push(this.LIST[this.CUR_LEVEL][2*this.CUR_IDX+1]);
+					}
+					
+					if(2*(this.CUR_IDX+1) < this.LIST[this.CUR_LEVEL].length){
+						this.CUR_IDX++;
+					}
+					else{
+						this.CUR_IDX = 0;
+						this.CUR_LEVEL++;
+					}					
+				},
+				
+				toggleClickEvent: function(onoff){
+					if(onoff==true){
+						this.$left.onclick = () => { this.select("L") };
+						this.$right.onclick = () => { this.select("R") };
+					}else{
+						this.$left.onclick = () => {};
+						this.$right.onclick = () => {};
+					}
+				},
+				
+				set$background: function($div, url){
+					$div.style.background = "url(" + url + ")";
+					$div.style.backgroundPosition = "center";
+					$div.style.backgroundRepeat = "no-repeat";
+					$div.style.backgroundSize = "contain";					
+				},
+				
+				clickAnimation: function($div){
+					let $opposite;
+					
+					if($div == this.$left) $opposite = this.$right;
+					else $opposite = this.$left;
+					
+					this.toggleClickEvent(false);
+					
+					let dist = (document.body.offsetWidth / 2) - $div.offsetLeft - ($div.offsetWidth/2);
+					$div.style.transform = "translate(" + dist + "px, 0px)";
+					
+					
+					$opposite.style.transition = "0.2s";
+					$opposite.style.opacity = 0;
+					setTimeout(()=>{$opposite.style.display="none"}, 100);
+					
+					setTimeout(() => {
+						$div.style.transition = "0s";
+						$div.style.transform = "";
+						$opposite.style.display = "block";
+						$opposite.style.transition = "0.7s";
+						if(this.setNext() == -1){ this.win(this.LIST[this.LIST.length-1][0]); return;}
+						setTimeout(()=>{ $div.style.transition = "0.7s"; this.toggleClickEvent(true); }, 1);
+						$opposite.style.opacity=1;}
+					, 1200);
+				},
+				
+				saveData: function(){
+					localStorage.setItem("idol.participate", this.PARTICIPATE);
+					localStorage.setItem("idol.winrate", this.WINRATE);
+					
+					let pNameList = "";
+					for(let i=0; i<this.PART_NAME.length; ++i){
+						for(let j=0; j<this.PART_NAME[i].length; ++j){
+							pNameList += this.PART_NAME[i][j] 
+							if(j < this.PART_NAME[i].length-1) pNameList += "`"
+						}
+						if(i < this.PART_NAME.length -1) pNameList += "|"
+					}
+					localStorage.setItem("idol.partlist", pNameList);
+				},
+				
+				loadData: function(){
+					let part = localStorage.getItem("idol.participate");
+					if(part != null) this.PARTICIPATE = parseInt(part);
+					else this.PARTICIPATE = 0;
+					
+					let winrate = localStorage.getItem("idol.winrate");
+					if(winrate != null && winrate.length > 1) this.WINRATE = winrate.split(',');
+					else{
+						this.WINRATE = [];
+						for(let i=0; i<this.LIST_LENGTH; ++i){ this.WINRATE.push(0); }
+					}
+					
+					//우승횟수
+					for(let i=0; i<this.WINRATE.length; ++i){
+						this.WINRATE[i] = parseInt(this.WINRATE[i]);
+					}
+					
+					//참가자 명단
+					let partlist = localStorage.getItem("idol.partlist");
+					
+					this.PART_NAME = [];
+					for(let i=0; i<this.LIST_LENGTH; ++i){
+						this.PART_NAME.push([]);
+					}
+					
+					if(partlist != null && partlist.length > 1){
+						partlist = partlist.split('|');
+						for(let i=0; i<partlist.length; ++i){
+							partlist[i] = partlist[i].split('`');
+							for(let j=0; j<partlist[i].length; ++j){
+								if(partlist[i][j]!="")
+									this.PART_NAME[i].push(partlist[i][j]);
+							}
+						}
+					}		
+				},
+				
+				win: function(idx){
+					this.PARTICIPATE++;
+					this.WINRATE[idx]++;
+					
+					this.showResult(this.$wrapper, idx);
+					this.saveData();
+				},
+				
+				showPartlist: function(idx){
+					
+					let partlist = [];
+					if(idx < 0){
+						for(let i=0; i<this.PART_NAME.length; ++i){
+							for(let j=0; j<this.PART_NAME[i].length; ++j){
+								partlist.push(this.PART_NAME[i][j]);
+							}
+						}
+					}
+					else partlist = this.PART_NAME[idx];
+					
+					let LEN = partlist.length;
+					if(LEN < 1) return;
+					
+					let $div = document.createElement("div");
+					$div.className = "part-list-popup";				
+					
+					
+					
+					let $p = document.createElement("p");
+					$p.innerText = partlist;
+					
+					let $btn = document.createElement("button");
+					$btn.onclick = () => { $div.style.opacity = 0; setTimeout(()=>{ $div.remove(); }, 500); }
+					$btn.innerText = "닫기";
+					
+					let $div2 = document.createElement("div");
+					$div2.className = "part-list-popup-center"
+					$div2.appendChild($p);
+					$div2.appendChild($btn);
+					$div.appendChild($div2);
+					
+					document.body.appendChild($div);
+					setTimeout(()=>{$div.style.opacity = 0.98; }, 3);
+				},
+				
+				showResult: function($div, winner){
+					$div.innerHTML = "";
+					
+					let NAME = this.PLAYER.length < 1 ? "" : "'" + this.PLAYER+"'님의 "
+					
+					
+					let list = [];
+					for(let i=0; i<this.WINRATE.length; ++i) list.push([i, this.WINRATE[i]]);
+					list.sort(function(a,b){ return parseInt(b[1]) - parseInt(a[1])});
+					
+					
+					let $ul = document.createElement("ul");
+					$ul.className = "man-ul";
+					
+					let $liTitle = document.createElement("li");
+					$liTitle.className = "man-li-title";
+					$liTitle.innerHTML = "<p>" + NAME + "결과</p><span><b>" + this.PARTICIPATE + "명</b>이 참여하였습니다!</span>"
+					
+					
+					//수정필요
+					$liTitle.children[1].children[0].onclick = () => { this.showPartlist(-1); };
+					
+					
+
+					$ul.appendChild($liTitle);
+					
+					for(let i=0; i<this.LIST_LENGTH; ++i){
+						let selection = list[i][1];
+						let percent = Math.round(selection / this.PARTICIPATE * 100);
+					
+						let $li = document.createElement("li");
+						$li.className = "man-li";
+						
+						//모든 투표를 마치고 결과를 보는 경우
+						if(winner != undefined && list[i][0]==winner){
+							$li.classList.add("man-li-select");
+							if(this.PLAYER != "") this.PART_NAME[winner].push(this.PLAYER);
+						}
+						$li.innerHTML = "<span>" + (i+1) + "</span>";
+						
+						let $div1 = document.createElement("div");
+						$div1.className = "man-li-img";
+						this.set$background($div1, this.directory + (list[i][0]+1) + ".idl");
+
+						let $div2 = document.createElement("div");
+						$div2.className = "man-li-info";
+						
+						let $pName = document.createElement("p");
+						$pName.className = "man-li-name";
+						$pName.innerText = MEMBER.NAME[list[i][0]];
+						
+						let $pInfo = document.createElement("p");
+						if(i==0)
+							$pInfo.innerHTML = "참가자의 <strong class='man-li1'>" + percent + "%</strong>가 선택하였습니다.(" + selection + "회 우승)</p>";
+						else
+							$pInfo.innerHTML = "참가자의 <b>" + percent + "%</b>가 선택하였습니다.(" + selection + "회 우승)</p>";
+							
+						/// 수정 필요
+						$pInfo.children[0].onclick = () => { this.showPartlist(list[i][0]); };	
+							
+						$li.appendChild($div1);
+						$li.appendChild($div2);												
+						$div2.appendChild($pName);
+						$div2.appendChild($pInfo);
+						$ul.appendChild($li);
+						$div.appendChild($ul);
+					}
+				}
+			}
+			
+			MATCH.render$Input();
+		
+		</script>
+	</body>
+</html>

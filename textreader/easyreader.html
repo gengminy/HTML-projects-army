@@ -1,0 +1,1021 @@
+<!Doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Easy Reader</title>
+        <style>
+            ::-webkit-scrollbar {
+                width: 10px;
+            }
+
+            ::-webkit-scrollbar-track {
+                border: 1px solid #AAAAAA;
+                -webkit-box-shadow: inset 0 0 1px 1px rgba(0,0,0,0.1);
+                border-radius: 10px;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: #242424;
+                border-radius: 10px;
+            }
+
+            .darkMode {
+                background: black;
+                color: white;
+            }
+
+            body {
+                z-index: -1;
+                height: 97vh;
+                overflow-y: scroll;
+                user-select: none;
+                transition: 0.3s;
+            }
+
+            body::-webkit-scrollbar {
+                display: none;
+            }
+
+            .t-wrapper {
+                min-width: 50%;
+                height: 80%;
+            }
+
+            .fileListWrapper {
+                height: 90px;
+                width: 100%;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                border-top-left-radius: 10px;
+                border-top-right-radius: 10px;
+                border: 1px solid #CFCFCF;
+            }
+
+            .darkMode .fileListWrapper {
+                border: 1px solid #202020;
+            }
+
+            .fileListWrapper::-webkit-scrollbar {
+                display: none;
+            }
+
+            .fileList li:before {
+                content: ' ≡ ';
+            }
+
+            .fileList li {
+                transition: 0.3s;
+                text-indent: 10px;
+                line-height: 22px;
+                padding: 2px;
+            }
+
+            .fileList li:hover {
+                background: #DFDFDF;
+            }
+
+            .darkMode .fileList li:hover {
+                background: #303030;
+            }
+
+            .fileList li:nth-child(2n) {
+                background: #EFEFEF;
+            }
+
+            .darkMode .fileList li:nth-child(2n) {
+                background: #101010;
+            }
+
+            .fileList li:nth-child(2n):hover {
+                background: #CFCFCF;
+            }
+
+            .darkMode .fileList li:nth-child(2n):hover {
+                background: #404040;
+            }
+
+            .fileList li.selected {
+                background: #F9F162;
+            }
+
+            .fileList li.selected:hover {
+                background: #FDFBBF;
+            }
+
+            .fileList li.selected:before {
+                content: ' ✔ ';
+            }
+
+            .darkMode .fileList li.selected {
+                color: black;
+            }
+
+            .textBody {
+                font-size: 15px;
+                height: 100%;
+                width: 100%;
+                margin: 0 auto;
+                border: 1px solid black;
+                overflow-x: hidden;
+                overflow-y: scroll;
+                user-select: text;
+            }
+
+            .darkMode .textBody {
+                border: 1px solid white;
+            }
+
+            .zone {
+                position: absolute;
+                opacity: 0.7;
+                background: gray;
+                height: 100%;
+                width: 100%;
+                z-index: 100;
+            }
+
+            .textBody span {
+                padding: 0 3px 0 3px;
+                text-indent: 10px;
+            }
+
+            ul, li {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .menu-wrapper {
+                margin: 0;
+                padding: 0;
+                border: 1px solid #AFAFAF;
+                width: 100%;
+                height: 31px;
+                background: #EFEFEF;
+                list-style: none;
+            }
+
+            .darkMode .menu-wrapper {
+                background: #101010;
+            }
+
+            .menu-list-tab {
+                float: left;
+                width: 70px;
+                display: inline-block;
+                margin: 0 auto;
+                border: 0 ;
+                padding: 5px 10px 5px 10px;
+                text-align: center;
+                transition: 0.2s;
+            }
+
+            .menu-list-tab:hover {
+                background: #BDBDBD;
+            }
+
+            .darkMode .menu-list-tab:hover {
+                background: #404040;
+            }
+
+            .menu-list-tab:hover ul {
+                position: absolute;
+                border: 1px solid black;
+                display: inline-block;
+                transform: translate(-60px, 25px);
+            }
+
+            .darkMode .menu-list-tab:hover ul {
+                border: 1px solid white;
+            }
+
+            .menu-list {
+                background: white;
+                width: 150px;
+                display: none;
+            }
+
+            .darkMode .menu-list {
+                background: black;
+            }
+
+            .menu-list li {
+                min-height: 22px;
+                line-height: 22px;
+                text-align: center;
+                border: 1px solid #EFEFEF;
+                transition: 0.3s;
+            }
+
+            .darkMode .menu-list li {
+                border: 1px solid #101010;
+            }
+
+            .menu-list li:hover {
+                background: #EFEFEF;
+            }
+
+            .darkMode .menu-list li:hover {
+                background: #424242;
+            }
+
+            .menu-list li.menu-list-selected {
+                background: #F9F162;
+                border: 1px solid #F9F100;
+            }
+
+            .darkMode .menu-list li.menu-list-selected {
+                color: black;
+            }
+
+            .menu-list li.menu-list-selected:hover {
+                background: #FDFBBF;
+                border: 1px solid #FDFBBF;
+            }
+
+            input[type='number'] {
+                text-align: center;
+                text-indent: 10px;
+                font-size: 23px;
+                width: 100px;
+                margin: 3px;
+                border: 2px solid #ACACAC;
+            }
+
+            input[type='number']:focus {
+                outline: 2px solid red;
+            }
+
+            .darkMode input[type='number'] {
+                border: 2px solid #464646;
+                background: black;
+                color: white;
+            }
+
+            #bookMarkSelector li span {
+                padding: 0 10% 0 10%;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            #bookMarkSelector li button {
+                float: right;
+                border: 1px solid black;
+                line-height: 130%;
+                transition: 0.3s;
+            }
+
+            #bookMarkSelector li button:hover {
+                background: red;
+            }
+
+            .textBody p {
+                margin: 0 auto;
+                padding: 10px;
+            }
+
+            .textBody p:nth-child(2n+1) {
+                background: #EEEEEE;
+            }
+
+            .darkMode .textBody p:nth-child(2n+1) {
+                background: #222222;
+            }
+
+            .control-wrapper {
+                width: 100%;
+                text-align: center;
+            }
+
+            .control-wrapper button {
+                border: 3px solid #DFDFDF;
+                background: white;
+                padding: 5px 10px 5px 10px;
+                margin: 5px;
+                transition: 0.3s;
+            }
+
+            .control-wrapper button:focus {
+                outline: 0;
+            }
+
+            .control-wrapper button:hover {
+                background: #EAEAEA;
+                border: 3px solid #AAAAAA;
+            }
+
+            .darkMode .control-wrapper button {
+                border: 3px solid #303030;
+                background: black;
+                color: white;
+            }
+
+            .darkMode .control-wrapper button:hover {
+                background: #383838;
+                border: 3px solid #626262;
+            }
+
+            .zone-hidden {
+                display: none;
+            }
+
+            #curPage {
+                border: 2px solid #BFBFBF;
+                width: 40px;
+                text-align: center;
+                font-size: 16px;
+            }
+
+            #curPage:focus {
+                outline: 3px solid red;
+                ; padding: 0;
+            }
+
+            .darkMode #curPage {
+                border: 2px solid #303030;
+                background: black;
+                color: white;
+            }
+
+            #dropInput {
+                width: 100%;
+                height: 100%;
+                margin: 0 auto;
+                border: 0;
+                padding: 0;
+                background: transparent;
+            }
+
+            #darkModeSelector {
+                line-height: 150%;
+                margin-left: 5px;
+                border: 0;
+                padding: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <div class='fileListWrapper'>
+            <ul class='fileList'>
+                <li>현재 선택된 파일이 없습니다</li>
+                <li>파일열기 또는 폴더열기를 통해 파일을 업로드 하거나</li>
+                <li>파일 드래그를 통해 텍스트 파일을 열 수 있습니다</li>
+            </ul>
+        </div>
+        <div class="t-wrapper">
+            <div>
+                <ol class="menu-wrapper">
+                    <li class="menu-list-tab">
+                        <span class="control-menu">파일
+
+                        </span>
+                        <ul id='fileSelector' class="menu-list"></ul>
+                    </li>
+                    <li class="menu-list-tab">
+                        <span class="control-menu">크기
+
+                        </span>
+                        <ul id="fontSizeSelector" class="menu-list"></ul>
+                    </li>
+                    <li class="menu-list-tab">
+                        <span id="" class="control-menu">글꼴
+  
+                        </span>
+                        <ul id="fontFamilySelector" class="menu-list"></ul>
+                    </li>
+                    <li class="menu-list-tab">
+                        <span id="" class="control-menu">정렬
+                            
+
+                        </span>
+                        <ul id="textAlignSelector" class="menu-list"></ul>
+                    </li>
+                    <li class="menu-list-tab">
+                        <span id="" class="control-menu">보기
+                            
+
+                        </span>
+                        <ul id="textTypeSelector" class="menu-list"></ul>
+                    </li>
+                    <li class="menu-list-tab">
+                        <span id="" class="control-menu">이동
+                            
+
+                        </span>
+                        <ul id="bookMarkSelector" class="menu-list">
+                            <li>북마크리스트
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="menu-list-tab">
+                        <span id="" class="control-menu">설정
+                            
+
+                        </span>
+                        <ul class="menu-list">
+                            <li>
+                                한번에 표시할 문장<input id='sentenceCountSelector' type="number" min=5 max=500 value=10></input>
+                            </li>
+                            <li>
+                                다크 모드<input type='checkbox' id='darkModeSelector'></input>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="menu-list-tab">
+                        <span id="" class="control-menu">북마크
+
+                        </span>
+                        <ul class="menu-list">
+                            <li onclick='TextReader.setBookMark()'>현재 페이지 저장
+                            </li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+            <div class="zone zone-hidden">
+                <input id="dropInput" type="file"></input>
+            </div>
+            <div class="textBody">
+                <p>this is for test</p>
+                <p>this is for test</p>
+                <p>this is for test</p>
+                <p>this is for test</p>
+                <p>this is for test</p>
+                <p>this is for test this is for test this is for test this is for test this is for test this is for testthis is for test this is for testthis is for testthis is for testthis is for testthis is for test</p>
+            </div>
+            <div class="control-wrapper">
+                <button id="prev">
+                    <</button>
+				<input id="curPage" value=1></input>
+                    <span>/</span>
+                    <span id="wholePage">1</span>
+                    <button id="next">></button>
+            </div>
+        </div>
+        <script type="text/javascript">
+
+            let TextReader = {
+                file: null,
+
+                text: ['this is for test', 'this is for test', 'this is for test', 'this is for test', 'this is for test', 'this is for test', 'this is for test', 'this is for test', 'this is for test', 'this is for test'],
+
+                $target: {
+                    body: document.querySelector(".textBody"),
+                    prev: document.querySelector("#prev"),
+                    next: document.querySelector("#next"),
+                    curPage: document.querySelector("#curPage"),
+                    wholePage: document.querySelector("#wholePage"),
+                    darkModeSelector: document.querySelector('#darkModeSelector'),
+                    fileList: document.querySelector('.fileList'),
+                    fileSelector: document.querySelector("#fileSelector"),
+                    fontSizeSelector: document.querySelector("#fontSizeSelector"),
+                    fontFamilySelector: document.querySelector("#fontFamilySelector"),
+                    textAlignSelector: document.querySelector("#textAlignSelector"),
+                    textTypeSelector: document.querySelector("#textTypeSelector"),
+                    sentenceCountSelector: document.querySelector("#sentenceCountSelector"),
+                    bookMarkSelector: document.querySelector("#bookMarkSelector"),
+
+                    progressBar: document.querySelector('.progressBar')
+                },
+
+                _config: {
+                    fontSize: 15,
+                    fontFamily: '맑은 고딕',
+                    textAlign: 'left',
+                    sentenceCount: 10,
+                    //한번에 출력할 문장 개수
+                    textType: 'p',
+                    keyCode: {
+                        nextPage: [39, 32],
+                        prevPage: [37]
+                    },
+                    darkMode: false
+
+                },
+
+                _fileList: [],
+                _fontSizeList: [12, 13, 14, 15, 16, 17, 18, 19, 20, 22, 23, 25, 27],
+                _fontFamilyList: ['강한육군', '굴림', '궁서', '바탕', '돋움', '맑은 고딕', '한컴 백제 B', '한컴 백제 M', '한컴 소망 B', '한컴 소망 M', '한컴 윤체 B', '한컴 윤체 M'],
+                _textAlignList: [['왼쪽', 'left'], ['가운데', 'center'], ['오른쪽', 'right'], ['균일', 'justify']],
+                _textTypeList: [['문단', 'span'], ['문장', 'p']],
+                _bookMarkList: [],
+
+                _currentPage: 1,
+                _maxPage: 1,
+                //마지막 페이지
+
+                init: function() {
+
+                    this.setFileSelector();
+                    this.setFontSizeSelector();
+                    this.setFontFamilySelector();
+                    this.setTextAlignSelector();
+                    this.setTextTypeSelector();
+                    this.setSentenceCountSelector();
+                    this.setDarkModeSelector();
+                    this.setKeyboardEvent();
+                    this.setMouseWheelEvent();
+                    this.setDragDropEvent();
+
+                    this.loadBookMark();
+                    this.setBookMarkSelector();
+
+                    this.$target["next"].addEventListener("click", ()=>{
+                        this.setNextPage();
+                    }
+                    );
+                    this.$target["prev"].addEventListener("click", ()=>{
+                        this.setPrevPage();
+                    }
+                    );
+
+                    this.$target["curPage"].onkeydown = function(e) {
+                        let v = this.value;
+                        if (e.keyCode == 13 && v > 0 && v <= TextReader._maxPage) {
+                            TextReader.setPage(this.value);
+                        }
+                    }
+                    this.$target["curPage"].oninput = function() {
+                        if (this.value < 1 || this.value > TextReader._maxPage)
+                            this.value = TextReader._currentPage;
+
+                    }
+
+                    // this.loadLocalConfig();
+                },
+
+                toggleDarkMode: function() {
+                    let m = this._config.darkMode;
+                    if (m == false) {
+                        document.body.classList.add('darkMode');
+                    } else {
+                        document.body.classList.remove('darkMode');
+                    }
+
+                    this._config.darkMode = !this._config.darkMode;
+
+                },
+
+                saveBookMark: function(idx) {
+                    this._bookMarkList.push(idx);
+                    localStorage.setItem('reader.mark', this._bookMarkList);
+
+                },
+
+                deleteBookMark: function(idx) {
+                    let i = this._bookMarkList.indexOf(idx);
+                    if (i < 0)
+                        return;
+                    this._bookMarkList.splice(i, 1);
+
+                    if (this._bookMarkList.length < 1) {
+                        localStorage.removeItem('reader.mark');
+                        return;
+                    }
+
+                    localStorage.setItem('reader.mark', this._bookMarkList);
+
+                },
+
+                loadBookMark: function() {
+                    let item = localStorage.getItem('reader.mark');
+
+                    if (item == null || item == '')
+                        return;
+
+                    this._bookMarkList = item.split(',');
+                    if (this._bookMarkList == "") {
+                        this._bookMarkList = [];
+                        localStorage.removeItem('reader.mark');
+                        return;
+                    }
+                    for (i in this._bookMarkList) {
+                        this._bookMarkList[i] = parseInt(this._bookMarkList)
+                    }
+                    ;
+
+                },
+
+                saveLocalConfig: function() {
+                    let _c = this._config;
+                    let _l = [_c['fontSize'], _c['fontFamily'], _c['textAlign'], _c['sentenceCount'], _c['textType'], _c['keyCode']['nextPage'], _c['keyCode']['prevPage']];
+                    localStorage.setItem('reader.config', _l);
+                },
+                loadLocalConfig: function() {
+                    let _l = localStorage.getItem('reader.config');
+                    if (_l == null)
+                        return;
+
+                    let _c = this._config;
+                    _c['fontSize'] = _l[0];
+                    _c['fontFamily'] = _l[1];
+                    _c['textAlign'] = _l[2];
+                    _c['sentenceCount'] = _l[3];
+                    _c['textType'] = _l[4];
+                    _c['keyCode']['nextPage'] = _l[5];
+                    _c['keyCode']['prevPage'] = _l[6];
+                },
+
+                //textbody의 p요소 개수 변경
+                setTextBody: function(count, type='p') {
+                    if (count > 500)
+                        throw ("fn:setTextBody-too many Sentences")
+                    this.$target["body"].innerHTML = ""
+                    //empty
+                    this._config['sentenceCount'] = count;
+                    for (let i = 0; i < count; ++i) {
+                        let $p = document.createElement(type);
+                        this.$target["body"].appendChild($p);
+                    }
+                },
+
+                //한번에 보이는 문장 수 변경
+                changeSentenceCount: function(count) {
+                    let firstSentenceIndex = this._config['sentenceCount'] * (this._currentPage - 1);
+                    this.setTextBody(count, this._config.textType);
+                    this.setPage(Math.floor(firstSentenceIndex / count) + 1);
+                    this._maxPage = this.getPageLength();
+                    this.$target["wholePage"].innerHTML = this.getPageLength();
+                },
+
+                //특정 페이지로 이동
+                setPage: function(page) {
+                    if (page < 1 || this._maxPage < page) {
+                        console.log('Invalid Page Request');
+                        return;
+                    }
+
+                    this.$target["curPage"].value = page;
+                    this._currentPage = page;
+                    this.reloadPage();
+                },
+
+                //특정 인덱스가 포함된 페이지로 이동
+                tracePage: function(sentenceIndex) {
+                    let page = Math.floor(sentenceIndex / this._config['sentenceCount']) + 1;
+                    this.setPage(page);
+                },
+
+                setNextPage: function() {
+                    if (this._currentPage + 1 > this._maxPage)
+                        return;
+                    this.setPage(++this._currentPage);
+                },
+
+                setPrevPage: function() {
+                    if (this._currentPage - 1 < 1)
+                        return;
+                    this.setPage(--this._currentPage);
+                },
+
+                //전체 페이지 수 반환
+                getPageLength: function() {
+                    return Math.floor(this.text.length / this._config['sentenceCount']);
+                },
+
+                //_currentPage에 해당하는 페이지 리로드
+                reloadPage: function() {
+                    for (let i = 0; i < this._config['sentenceCount']; ++i) {
+                        let next = i + this._config['sentenceCount'] * (this._currentPage - 1);
+                        this.$target["body"].children[i].innerHTML = this.text[next];
+                    }
+
+                    this.$target.body.scrollTop = 0;
+                },
+
+                setFontSizeSelector: function() {
+                    let $t = this.$target.fontSizeSelector;
+                    $t.innerHTML = "";
+                    for (let i = 0; i < this._fontSizeList.length; ++i) {
+                        let $li = document.createElement("li");
+                        $li.innerHTML = `${this._fontSizeList[i]}px`;
+
+                        $li.onclick = ()=>{
+                            for (let j = 0; j < this._fontSizeList.length; ++j) {
+                                $t.children[j].classList.remove('menu-list-selected');
+                            }
+                            $li.classList.add('menu-list-selected');
+                            this.setFontSize(this._fontSizeList[i]);
+
+                            this.saveLocalConfig();
+                        }
+                        //defalut
+                        if (this._fontSizeList[i] == this._config['fontSize'])
+                            $li.classList.add('menu-list-selected');
+                        $t.appendChild($li);
+
+                    }
+                },
+
+                setFontSize: function(size) {
+                    if (size < 10)
+                        throw ('Fn:setFontSize-too small size');
+                    else if (size > 35)
+                        throw ('Fn:setFontSize-too big size');
+
+                    this.$target["body"].style.fontSize = `${size}px`;
+                },
+
+                setFileList: function(files) {
+                    let $t = this.$target.fileList;
+                    $t.innerHTML = '';
+
+                    this._fileList = [].concat(files);
+
+                    for (let i = 0; i < this._fileList.length; ++i) {
+                        let $li = document.createElement('li');
+                        $li.innerHTML = this._fileList[i].name;
+                        $li.ondblclick = ()=>{
+                            this.addFile(this._fileList[i]);
+
+                            for (let j = 0; j < files.length; ++j) {
+                                $t.children[j].classList.remove('selected');
+                            }
+                            $li.classList.add('selected');
+                        }
+                        $t.appendChild($li);
+                    }
+                },
+
+                setFileSelector: function() {
+                    let $t = this.$target.fileSelector;
+                    let $li = document.createElement('li');
+                    $li.innerHTML = '파일열기';
+                    $li.onclick = ()=>{
+                        let input = document.createElement("input");
+                        input.type = "file";
+                        //input.accept = "text/plain";
+                        input.onchange = (e)=>{
+                            this._fileList = e.target.files;
+                            this.addFile(e.target.files[0]);
+                            this.setFileList(this._fileList);
+                        }
+                        ;
+                        input.click();
+                    }
+                    $t.appendChild($li);
+
+                    $li = document.createElement('li');
+                    $li.innerHTML = '폴더열기';
+                    $li.onclick = ()=>{
+                        let input = document.createElement('div');
+                        input.innerHTML = '<input type="file" webkitdirectory></input>';
+                        input.children[0].onchange = (e)=>{
+                            this._fileList = e.target.files;
+                            this.setFileList(this._fileList);
+                        }
+                        input.children[0].click();
+                    }
+                    $t.appendChild($li);
+
+                },
+
+                setFontFamily: function(font) {
+                    this.$target["body"].style.fontFamily = font;
+                },
+
+                setFontFamilySelector: function() {
+                    let $t = this.$target.fontFamilySelector;
+                    $t.innerHTML = "";
+                    for (let i = 0; i < this._fontFamilyList.length; ++i) {
+                        let $li = document.createElement("li");
+                        $li.innerHTML = this._fontFamilyList[i];
+                        $li.style.fontFamily = this._fontFamilyList[i];
+                        $li.onclick = ()=>{
+                            for (let j = 0; j < this._fontFamilyList.length; ++j) {
+                                $t.children[j].classList.remove('menu-list-selected');
+                            }
+                            $li.classList.add('menu-list-selected');
+                            this.setFontFamily(this._fontFamilyList[i]);
+
+                            this.saveLocalConfig();
+                        }
+                        //defalut
+                        if (this._fontFamilyList[i] == this._config['fontFamily'])
+                            $li.classList.add('menu-list-selected');
+                        $t.appendChild($li);
+                    }
+                },
+
+                setTextAlignSelector: function() {
+                    let $t = this.$target['textAlignSelector'];
+                    $t.innerHTML = "";
+                    for (let i = 0; i < this._textAlignList.length; ++i) {
+                        let $li = document.createElement("li");
+                        $li.innerHTML = this._textAlignList[i][0];
+                        $li.onclick = ()=>{
+                            for (let j = 0; j < this._textAlignList.length; ++j) {
+                                $t.children[j].classList.remove('menu-list-selected');
+                            }
+                            $li.classList.add('menu-list-selected');
+                            this.setTextAlign(this._textAlignList[i][1]);
+
+                            this.saveLocalConfig();
+                        }
+                        //defalut
+                        if (this._textAlignList[i][1] == this._config['textAlign'])
+                            $li.classList.add('menu-list-selected');
+                        $t.appendChild($li);
+                    }
+                },
+                setTextAlign: function(direction) {
+                    this._config.textAlign = direction;
+                    this.$target["body"].style.textAlign = direction;
+                },
+
+                setTextTypeSelector: function() {
+                    let $t = this.$target['textTypeSelector'];
+
+                    $t.innerHTML = "";
+                    for (let i = 0; i < this._textTypeList.length; ++i) {
+                        let $li = document.createElement("li");
+                        $li.innerHTML = this._textTypeList[i][0];
+                        $li.onclick = ()=>{
+                            for (let j = 0; j < this._textTypeList.length; ++j) {
+                                $t.children[j].classList.remove('menu-list-selected');
+                            }
+                            $li.classList.add('menu-list-selected');
+                            this.setTextType(this._textTypeList[i][1]);
+
+                            this.saveLocalConfig();
+                        }
+                        //defalut
+                        if (this._textTypeList[i][1] == this._config['textType'])
+                            $li.classList.add('menu-list-selected');
+                        $t.appendChild($li);
+                    }
+                },
+
+                setTextType: function(type='p') {
+                    this._config.textType = type;
+                    this.setTextBody(this._config['sentenceCount'], type);
+                    this.reloadPage();
+                },
+
+                setSentenceCountSelector: function() {
+                    let $t = this.$target['sentenceCountSelector'];
+                    $t.value = this._config.sentenceCount;
+                    $t.oninput = ()=>{
+                        this.changeSentenceCount($t.value);
+                    }
+                },
+
+                setBookMark: function() {
+                    if (this.file == null) {
+                        console.log('초기화면에서는 저장할 수 없습니다');
+                        return
+                    }
+                    ;let idx = (this._currentPage - 1) * this._config.sentenceCount
+                    this.saveBookMark(idx);
+                    this.setBookMarkSelector();
+                },
+
+                setBookMarkSelector: function() {
+                    let $t = this.$target['bookMarkSelector'];
+                    $t.innerHTML = '';
+                    let b = this._bookMarkList;
+
+                    if (b.length == 0) {
+                        $t.innerHTML = '북마크가 없습니다';
+                        return;
+                    }
+
+                    for (let i = 0; i < b.length; ++i) {
+                        let $li = document.createElement('li');
+
+                        let $span = document.createElement('span');
+                        let $btn = document.createElement('button');
+                        $btn.innerHTML = 'X';
+
+                        $span.innerHTML = `북마크#${i + 1}`;
+
+                        $span.onclick = ()=>{
+                            if (this.file != null)
+                                this.tracePage(b[i]);
+                        }
+
+                        $btn.onclick = ()=>{
+                            this.deleteBookMark(b[i]);
+                            this.setBookMarkSelector();
+                        }
+
+                        $li.appendChild($span);
+                        $li.appendChild($btn);
+                        $t.appendChild($li);
+                    }
+
+                },
+
+                setDarkModeSelector: function() {
+                    this.$target.darkModeSelector.onchange = ()=>{
+                        this.toggleDarkMode();
+                    }
+                },
+
+                setKeyboardEvent: function() {
+                    document.onkeydown = (e)=>{
+                        if (this._config.keyCode.nextPage.indexOf(e.keyCode) > -1)
+                            this.setNextPage();
+                        else if (this._config.keyCode.prevPage.indexOf(e.keyCode) > -1)
+                            this.setPrevPage();
+                    }
+                },
+
+                setMouseWheelEvent: function() {
+                    document.onmousewheel = (e)=>{
+                        let dy = Math.floor(e.deltaY / 100);
+
+                        if (dy < 0) {
+                            for (let i = 0; i > dy; --i)
+                                this.setPrevPage();
+                        } else {
+                            for (let i = 0; i < dy; ++i)
+                                this.setNextPage();
+                        }
+
+                    }
+                },
+
+                setDragDropEvent: function() {
+                    function toggleDropZone() {
+                        let classList = document.querySelector(".zone").classList;
+                        let hasClass = classList.contains(".zone-hidden");
+
+                        if (hasClass)
+                            classList.remove("zone-hidden");
+                        else
+                            classList.add("zone-hidden");
+                    }
+
+                    document.ondrop = function(event) {
+                        event.preventDefault();
+                        event.stopPropagation();
+
+                    }
+                    this.$target.body.ondragenter = function(e) {
+                        document.querySelector(".zone").classList.remove("zone-hidden")
+                    }
+                    document.querySelector(".zone").ondragleave = function() {
+                        this.classList.add("zone-hidden")
+                    }
+
+                    document.querySelector("#dropInput").ondrop = (event)=>{
+                        toggleDropZone();
+                        var newFile;
+                        console.log("drop");
+                        event.preventDefault();
+                        event.stopPropagation();
+
+                        newFile = event.dataTransfer.files[0];
+                        if (newFile) {
+                            this.setFileList(newFile);
+                            this.$target.fileList.children[0].classList.add('selected');
+                            TextReader.addFile(newFile);
+                        }
+                    }
+                },
+
+                //파일 추가
+                addFile: function(file) {
+                    const reader = new FileReader();
+                    reader.onload = ()=>{
+                        this.processFile(reader.result);
+                    }
+                    //파일 로딩 끝나고 함수 실행
+                    reader.readAsText(file, /* optional*/
+                    "UTF-8");
+                    this.file = file;
+                },
+
+                //파일 변환
+                processFile: function(txt) {
+                    this.text = txt.split("\n");
+                    let i = 0;
+
+                    console.log('로딩중입니다...');
+                    let clearText = async()=>{
+                        while (i < this.text.length) {
+                            if (this.text[i].length <= 2 || this.text[i] === "" || this.text[i].charCodeAt() === 13 || this.text[i].charCodeAt() === 10) {
+                                this.text.splice(i, 1);
+                                continue;
+                            }
+                            i++;
+                        }
+                    }
+                    clearText();
+                    console.log('텍스트 로딩 완료');
+
+                    this._maxPage = Math.floor(this.text.length / this._config['sentenceCount']);
+                    this.$target["wholePage"].innerHTML = this._maxPage;
+                    this.setTextBody(this._config['sentenceCount']);
+                    this.setPage(1);
+
+                }
+            }
+
+            //input.accept = "text/plain";
+
+            TextReader.init();
+        </script>
+    </body>
+</html>
